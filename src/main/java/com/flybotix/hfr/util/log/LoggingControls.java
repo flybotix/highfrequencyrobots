@@ -18,6 +18,8 @@ class LoggingControls extends Delegator<LogOutput>{
 			.getName());
 
 	private LogHistory mHistory = new LogHistory();
+
+  private ELevel mLevel = ELevel.WARN;
 	
 	List<LogOutput> getHistory()
 	{
@@ -36,13 +38,15 @@ class LoggingControls extends Delegator<LogOutput>{
 	}
 
 	void log(ELevel pLevel, String pText) {
-		LogOutput output = new LogOutput(
-				System.currentTimeMillis(), 
-				pLevel, 
-				pText, 
-				Thread.currentThread().getName(), 
-				getCurrentThreadClassName());
-		update(output);
+	  if(pLevel.ordinal() >= mLevel.ordinal()) {
+  		LogOutput output = new LogOutput(
+  				System.currentTimeMillis(), 
+  				pLevel, 
+  				pText, 
+  				Thread.currentThread().getName(), 
+  				getCurrentThreadClassName());
+  		update(output);
+	  }
 	}
 	
 	void logException(Exception pException)
@@ -57,6 +61,10 @@ class LoggingControls extends Delegator<LogOutput>{
 	void printStackTrace(ELevel pLevel, StackTraceElement[] pElements)
 	{
 		printStackTrace(pLevel, -1L, pElements, new String[0]);
+	}
+	
+	void setOutputLevel(ELevel pLevel) {
+	  mLevel  = pLevel;
 	}
 
 	void printStackTrace(ELevel pLevel, long delay,

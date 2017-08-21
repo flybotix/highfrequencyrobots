@@ -45,6 +45,10 @@ public class Logger implements ILog {
 		LoggingControls.INST.log(ELevel.WARN, generateString(pOutputs));
 
 	}
+	
+	public static void setLevel(ELevel pLevel) {
+	  LoggingControls.INST.setOutputLevel(pLevel);
+	}
 
 	public static ILog createLog(Class<?> pClass) {
 		ILog result = sDEBUGS.get(pClass);

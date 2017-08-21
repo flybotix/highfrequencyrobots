@@ -43,18 +43,22 @@ public class UDPReceiver extends ASocketReceiver {
     while (mStatus.isConnected() && mSocket != null) {
       try {
         mSocket.receive(incoming);
-        byte[] receivedData = new byte[incoming.getLength()];
-        System.arraycopy(incoming.getData(), 0, receivedData, 0, receivedData.length);
+        byte[] msgIdBuffer = new byte[Integer.BYTES];
+        System.arraycopy(incoming.getData(), 0, msgIdBuffer, 0, Integer.BYTES);
+        int msgId = ByteBuffer.wrap(msgIdBuffer).getInt();
+        
+        byte[] msgSizeBuffer = new byte[Integer.BYTES];
+        System.arraycopy(incoming.getData(), Integer.BYTES, msgSizeBuffer, 0, Integer.BYTES);
+        int msgSize = ByteBuffer.wrap(msgSizeBuffer).getInt();
+
+        byte[] receivedData = new byte[msgSize];
+        System.arraycopy(incoming.getData(), 2*Integer.BYTES, receivedData, 0, msgSize);
+        
+        // remember to reset the length of the packet to its maximum size every time
         incoming.setLength(mMaxBufferSize);
-        
-        // At this point we have a length, but not a type.  Presume the first integer is the type.
-        int msgSize = receivedData.length - Integer.BYTES;
-        
-        // Wrap the integer region in its own buffer and decode it.
-        int msgId = ByteBuffer.wrap(receivedData, 0, Integer.BYTES).getInt();
-        
+
+        ByteBuffer msg = ByteBuffer.wrap(receivedData);
         // Then wrap the remaining region in a separate buffer as the message.
-        ByteBuffer msg = ByteBuffer.wrap(receivedData, Integer.BYTES, msgSize);
         mLog.debug("Received message ", msgId, " with size ", msgSize, ": ", Arrays.toString(receivedData));
         addMessageToQ(msgId, msg);
       } catch (IOException e) {
@@ -69,7 +73,8 @@ public class UDPReceiver extends ASocketReceiver {
 
   @Override
   public void addParserForMessageType(Integer pType, IMessageParser<?> pParser) {
-    mMaxBufferSize = Math.max(mMaxBufferSize, pParser.getBufferSize() + Integer.BYTES);
+    mMaxBufferSize = Math.max(mMaxBufferSize, pParser.getBufferSize() + 2*Integer.BYTES);
+    mLog.info("Registering msg " + pType + " with buffer size " + pParser.getBufferSize());
     mMessageParsers.put(pType, pParser);
   }
 

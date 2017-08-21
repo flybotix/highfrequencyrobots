@@ -11,7 +11,7 @@ import com.flybotix.hfr.util.lang.Delegator;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
-public abstract class ADataSender extends Delegator<ConnectionStatus> {
+public abstract class ADataSender extends Delegator<ConnectionStatus> implements ISendProtocol{
   protected final MessageQueue mMessageQ = new MessageQueue();
   protected int mDestPort;
   protected int mHostPort;
@@ -20,17 +20,20 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> {
   private boolean mIsRegisteredWithShutdown = false;
 
   private ILog mLog = Logger.createLog(ADataSender.class);
-  
+
+  @Override
   public void setHostPort(int pPort) {
     mHostPort = pPort;
     reconnectIfLive();
   }
-  
+
+  @Override
   public void setDestPort(int pPort) {
     mDestPort = pPort;
     reconnectIfLive();
   }
   
+  @Override
   public void setDestAddress(String pAddress) {
     mDestAddress = pAddress;
     reconnectIfLive();
@@ -38,7 +41,8 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> {
   
   protected abstract void establishConnection(InetAddress addr);
 
-  
+
+  @Override
   public final void connect() {
     if(!mStatus.isConnected()) {
       try {
@@ -54,12 +58,13 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> {
       }
     }
   }
-  
+
+  @Override
   public void disconnect() {
     update(mStatus.expectedDisconnect());
   }
 
-  
+  @Override
   public void sendMessage(int pId, byte[] pMessage) {
     ByteBuffer bb = ByteBuffer.allocate(Integer.BYTES + Integer.BYTES + pMessage.length);
     bb.putInt(pId);

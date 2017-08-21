@@ -1,6 +1,6 @@
 package com.flybotix.hfr.io.receiver;
 
-public interface IDataReceiver extends Runnable {
+public interface IReceiveProtocol extends Runnable {
   public void addParserForMessageType(Integer pType, IMessageParser<?> pParser);
   
   public default void addParserForMessageType(Class<?> pType, IMessageParser<?> pParser) {

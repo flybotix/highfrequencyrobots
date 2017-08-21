@@ -1,6 +1,7 @@
 package com.flybotix.hfr.io.receiver;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ import com.flybotix.hfr.util.log.Logger;
  * If Class<T> equals the decoded object's class, then any listener who was added to this class will
  * be notified of the incoming message (which is of type <T>).
  */
-public abstract class AMessageReceiver <T> extends Delegator<T> implements IDataReceiver {
+public abstract class AMessageReceiver <T> extends Delegator<T> implements IReceiveProtocol {
   private ILog mLog = Logger.createLog(AMessageReceiver.class);
   protected final Map<Integer, MessageQueue> mMessageQ = new HashMap<>();
   protected final Map<Integer, IMessageParser<?>> mMessageParsers = new HashMap<>();
@@ -65,6 +66,7 @@ public abstract class AMessageReceiver <T> extends Delegator<T> implements IData
               // often the messages come in
               for(ByteBuffer bb : cache) {
                 try {
+                  mLog.debug("Parsing ", Arrays.toString(bb.array()));
                   Object o = parser.read(bb);
                   if(o != null && pType != null && pType.equals(o.getClass())) {
                     update(pType.cast(o));

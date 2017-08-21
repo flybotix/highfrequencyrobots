@@ -17,6 +17,6 @@ public class LogOutput {
 	}
 	
 	public String toString() {
-	  return method + ":\t" + text;
+	  return "[" + level + "] " + method + ":\t" + text;
 	}
 }

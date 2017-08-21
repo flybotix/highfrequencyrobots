@@ -39,7 +39,7 @@ public class TCPSender extends ADataSender {
           try {
             OutputStream output = mClientSocket.getOutputStream();
             writer = new DataOutputStream (output);
-            mLog.debug("Data Output Stream Found");
+            mLog.info("Data Output Stream Found");
           } catch (IOException e) {
             e.printStackTrace();
           } 
