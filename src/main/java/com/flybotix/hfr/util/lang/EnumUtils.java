@@ -1,0 +1,34 @@
+package com.flybotix.hfr.util.lang;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+
+public class EnumUtils {
+  
+  public static <E extends Enum<E>> List<E> getSortedEnums(Class<E> pEnumeration) {
+    Set<E> set = EnumSet.allOf(pEnumeration);
+    List<E> result = new ArrayList<E>();
+    result.addAll(set);
+    Collections.sort(result, (e1, e2) -> Integer.compare(e1.ordinal(), e2.ordinal()));
+    return result;
+  }
+  
+  @SuppressWarnings("unchecked")
+  public static <E extends Enum<E>> Class<E> getEnumClass(String pString) {
+    try {
+      return (Class<E>)EnumUtils.class.getClassLoader().loadClass(pString);
+    } catch (ClassNotFoundException e) {
+      System.err.println(e.getMessage());
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  public static <E extends Enum<E>> List<E> classLoadEnums(String pClass) {
+    Class<E> clazz = getEnumClass(pClass);
+    return getSortedEnums(clazz);
+  }
+}
