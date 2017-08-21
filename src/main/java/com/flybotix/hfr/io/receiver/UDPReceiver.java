@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -23,7 +24,8 @@ public class UDPReceiver extends ASocketReceiver {
   public void connect() {
     update(mStatus.attemptingConnection());
     try {
-      mSocket = new DatagramSocket(mPort);
+      mSocket = new DatagramSocket(mHostPort);
+      mLog.debug("Local port: ",mHostPort);
       update(mStatus.connectionEstablished());
     } catch (SocketException e1) {
       mLog.exception(e1);
@@ -41,7 +43,6 @@ public class UDPReceiver extends ASocketReceiver {
     while (mStatus.isConnected() && mSocket != null) {
       try {
         mSocket.receive(incoming);
-        update(mStatus.periodicUpdate(true));
         byte[] receivedData = new byte[incoming.getLength()];
         System.arraycopy(incoming.getData(), 0, receivedData, 0, receivedData.length);
         incoming.setLength(mMaxBufferSize);
@@ -54,15 +55,15 @@ public class UDPReceiver extends ASocketReceiver {
         
         // Then wrap the remaining region in a separate buffer as the message.
         ByteBuffer msg = ByteBuffer.wrap(receivedData, Integer.BYTES, msgSize);
+        mLog.debug("Received message ", msgId, " with size ", msgSize, ": ", Arrays.toString(receivedData));
         addMessageToQ(msgId, msg);
       } catch (IOException e) {
         mLog.exception(e);
         update(mStatus.unexpectedDisconnect());
-      } finally {
-        if(mSocket != null) {
-          mSocket.close();
-        }
       }
+    }
+    if(mSocket != null) {
+      mSocket.close();
     }
   }
 

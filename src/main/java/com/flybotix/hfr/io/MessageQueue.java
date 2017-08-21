@@ -16,10 +16,18 @@ public final class MessageQueue {
     sync.release();
   }
   
+  public void addFirst(ByteBuffer bb) throws InterruptedException {
+    sync.acquire();
+    Q.addFirst(bb);
+    sync.release();
+  }
+  
   public ByteBuffer removeFirst() throws InterruptedException {
     ByteBuffer result = null;
     sync.acquire();
-    result = Q.removeFirst();
+    if(!Q.isEmpty()) {
+      result = Q.removeFirst();
+    }
     sync.release();
     return result;
   }

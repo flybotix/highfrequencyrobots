@@ -95,7 +95,7 @@ public class TCPReceiver extends ASocketReceiver {
   protected void establishConnection() {
     update(mStatus.attemptingConnection());
     try {
-      mServerSocket = new ServerSocket(mPort, 2, null);
+      mServerSocket = new ServerSocket(mHostPort, 2, null);
 
       mLog.debug("Server Attempt Accept");
       mClientSocket = mServerSocket.accept();
@@ -108,7 +108,7 @@ public class TCPReceiver extends ASocketReceiver {
       mcClientConnected = new Semaphore(0, true);// create "mutex" semaphore so user knows when
                                                  // Client is done
     } catch (IOException e) {
-      mLog.error("Error Connecting to ", mIpAddress, ":", mPort, " ", e.getMessage());
+      mLog.error("Error Connecting to ", mHostAddress, ":", mHostPort, " ", e.getMessage());
       mLog.exception(e);
       update(mStatus.errorDuringAttempt());
     }

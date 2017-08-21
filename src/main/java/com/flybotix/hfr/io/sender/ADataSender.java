@@ -13,19 +13,26 @@ import com.flybotix.hfr.util.log.Logger;
 
 public abstract class ADataSender extends Delegator<ConnectionStatus> {
   protected final MessageQueue mMessageQ = new MessageQueue();
-  protected int mPort;
-  protected String mIpAddress;
+  protected int mDestPort;
+  protected int mHostPort;
+  protected String mDestAddress;
   protected final ConnectionStatus mStatus = new ConnectionStatus(ESocketType.CLIENT);
+  private boolean mIsRegisteredWithShutdown = false;
 
   private ILog mLog = Logger.createLog(ADataSender.class);
   
-  public void setPort(int pPort) {
-    mPort = pPort;
+  public void setHostPort(int pPort) {
+    mHostPort = pPort;
     reconnectIfLive();
   }
   
-  public void setIpAddress(String pAddress) {
-    mIpAddress = pAddress;
+  public void setDestPort(int pPort) {
+    mDestPort = pPort;
+    reconnectIfLive();
+  }
+  
+  public void setDestAddress(String pAddress) {
+    mDestAddress = pAddress;
     reconnectIfLive();
   }
   
@@ -35,9 +42,12 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> {
   public final void connect() {
     if(!mStatus.isConnected()) {
       try {
-        InetAddress addr = InetAddress.getByName(mIpAddress);
+        InetAddress addr = InetAddress.getByName(mDestAddress);
         establishConnection(addr);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnect()));
+        if(!mIsRegisteredWithShutdown) {
+          Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnect()));
+          mIsRegisteredWithShutdown = true;
+        }
       } catch (UnknownHostException e) {
         update(mStatus.errorDuringAttempt());
         mLog.error(e.getMessage());

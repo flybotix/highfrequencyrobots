@@ -15,8 +15,8 @@ public abstract class ASocketReceiver extends AMessageReceiver<ConnectionStatus>
   protected final ESocketType mType;
   protected final ConnectionStatus mStatus;
   private ILog mLog = Logger.createLog(ASocketReceiver.class);
-  protected int mPort;
-  protected String mIpAddress;
+  protected int mHostPort;
+  protected String mHostAddress = "localhost";
   
   public ASocketReceiver(ESocketType pType) {
     super(ConnectionStatus.class);
@@ -25,11 +25,11 @@ public abstract class ASocketReceiver extends AMessageReceiver<ConnectionStatus>
   }
   
   public void setPort(int pPort) {
-    mPort = pPort;
+    mHostPort = pPort;
   }
   
   public void setIpAddress(String pAddress) {
-    mIpAddress = pAddress;
+    mHostAddress = pAddress;
   }
   
   @Override

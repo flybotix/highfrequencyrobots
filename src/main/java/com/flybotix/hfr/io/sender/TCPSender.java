@@ -32,7 +32,7 @@ public class TCPSender extends ADataSender {
         try {
           mSocketLock.acquire();
           mLog.debug("Inet Addr:" + addr);
-          mClientSocket = new Socket(addr, mPort);
+          mClientSocket = new Socket(addr, mDestPort);
           mLog.debug("Client Established");
     
           mLog.debug("Attempting to find Output Stream");
@@ -46,7 +46,7 @@ public class TCPSender extends ADataSender {
           update(mStatus.connectionEstablished());
           startReadTask();
         } catch (ConnectException ce) {
-          mLog.error("Error Connecting to ", mIpAddress, ":", mPort);
+          mLog.error("Error Connecting to ", mDestAddress, ":", mDestPort);
           update(mStatus.errorDuringAttempt());
           mSocketLock.release();
 
@@ -57,7 +57,7 @@ public class TCPSender extends ADataSender {
           }
         } catch (IOException e) {
           mSocketLock.release();
-          mLog.error("Error Connecting to ", mIpAddress, ":", mPort);
+          mLog.error("Error Connecting to ", mDestAddress, ":", mDestPort);
           mLog.exception(e);
           update(mStatus.errorDuringAttempt());
         } catch (InterruptedException e1) {

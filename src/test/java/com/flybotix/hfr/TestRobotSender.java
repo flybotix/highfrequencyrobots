@@ -1,8 +1,5 @@
 package com.flybotix.hfr;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.encode.AEncoder;
 import com.flybotix.hfr.codex.encode.EncoderFactory;
@@ -14,8 +11,6 @@ import com.flybotix.hfr.util.log.Logger;
 
 public class TestRobotSender {
 
-  private static List<Codex<ETestData, Double>> data = new ArrayList<>();
-  private static Codex<ETestData, Double> latest = null; 
   private static ILog LOG = Logger.createLog(TestRobotSender.class);
 
   public static void main(String[] pArgs) throws Exception{
@@ -23,7 +18,8 @@ public class TestRobotSender {
     for(ETestData e : ETestData.values()) {
       data.put(e, e.ordinal() * 10d);
     }
-    testSendViaTCP(data);
+//    testSendViaTCP(data);
+    testSendViaUDP(data);
   }
 
   private static void testSendViaTCP(Codex<ETestData, Double> data) throws InterruptedException {
@@ -39,8 +35,8 @@ public class TestRobotSender {
         LOG.debug("TCPSender status: " + status.getState());
       }
     });
-    protocol.setPort(7777);
-    protocol.setIpAddress("localhost");
+    protocol.setDestPort(7777);
+    protocol.setDestAddress("localhost");
     protocol.connect();
     
 
@@ -49,8 +45,17 @@ public class TestRobotSender {
     protocol.sendMessage(ETestData.class.hashCode(), enc.encode(data));
   }
 
-  private static void testReceiptViaUDP() {
+  private static void testSendViaUDP(Codex<ETestData, Double> data) {
     UDPSender protocol = new UDPSender();
+    protocol.setDestAddress("localhost");
+    protocol.setHostPort(7778);
+    protocol.setDestPort(7777);
+    protocol.addListener(update->LOG.debug(update));
+    protocol.connect();
+
+    final AEncoder<ETestData, Double> enc = EncoderFactory.getDoubleEncoder(ETestData.class, true);
+    System.out.println("Sending " + data);
+    protocol.sendMessage(ETestData.class.hashCode(), enc.encode(data));
   }
 
   private static void testReceipViaNT() {
