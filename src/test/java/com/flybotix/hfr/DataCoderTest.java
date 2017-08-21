@@ -3,16 +3,14 @@ package com.flybotix.hfr;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import com.flybotix.hfr.codex.Codex;
-import com.flybotix.hfr.io.encode.AbstractEncoder;
-import com.flybotix.hfr.io.encode.EncoderFactory;
-import com.flybotix.hfr.util.log.Logger;
+import com.flybotix.hfr.codex.encode.AEncoder;
+import com.flybotix.hfr.codex.encode.EncoderFactory;
 
 public class DataCoderTest {
   
@@ -57,7 +55,7 @@ public class DataCoderTest {
     return sparsity.stream();
   }
   
-  private static Codex<TEST, Double> getRandomArray(double pProbOfData, AbstractEncoder<TEST, Double> pCoder) {
+  private static Codex<TEST, Double> getRandomArray(double pProbOfData, AEncoder<TEST, Double> pCoder) {
     Codex<TEST, Double> res = new Codex<>(pCoder);
     for(TEST t : pCoder.getEnums()) {
       if(Math.random() <= pProbOfData) { 
@@ -69,7 +67,7 @@ public class DataCoderTest {
   
   private static boolean verifyCompressionAlgorithm() {
     System.out.println("Verifying Array Integrity.");
-    AbstractEncoder<TEST, Double> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
+    AEncoder<TEST, Double> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
     for(double s = 0.05; s < 1.0; s+= 0.05){
       nonsparse = s;
       Codex<TEST, Double> random = getRandomArray(nonsparse, dc);
@@ -119,7 +117,7 @@ public class DataCoderTest {
   
   private static void testRaw(Result r) {
 //    AbstractEncoder<TEST, Double> dc = new UncompressedDoubleEncoder<>(TEST.class);
-    AbstractEncoder<TEST, Double> dc = EncoderFactory.getDoubleEncoder(TEST.class, false);
+    AEncoder<TEST, Double> dc = EncoderFactory.getDoubleEncoder(TEST.class, false);
     Map<Integer, Codex<TEST, Double>> input = new HashMap<>();
     for(Integer i = 0; i < numIters; i++) {
       input.put(i, getRandomArray(nonsparse, dc));
@@ -157,7 +155,7 @@ public class DataCoderTest {
   }
   
   private static void testCompressed(Result r) {
-    AbstractEncoder<TEST, Double> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
+    AEncoder<TEST, Double> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
     Map<Integer, Codex<TEST, Double>> input = new HashMap<>();
     for(Integer i = 0; i < numIters; i++) {
       input.put(i, getRandomArray(nonsparse, dc));

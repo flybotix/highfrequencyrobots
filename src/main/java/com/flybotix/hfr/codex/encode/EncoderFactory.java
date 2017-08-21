@@ -1,10 +1,10 @@
-package com.flybotix.hfr.io.encode;
+package com.flybotix.hfr.codex.encode;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class EncoderFactory {
-  public static <E extends Enum<E>> AbstractEncoder<E, Double> getDoubleEncoder(Class<E> pEnum, boolean pUseCompression) {
+  public static <E extends Enum<E>> AEncoder<E, Double> getDoubleEncoder(Class<E> pEnum, boolean pUseCompression) {
     if(pUseCompression) {
       return new CompressedEncoder<E, Double>(pEnum, DOUBLE_ENCODER_PROPERTIES);
     } else {
@@ -12,7 +12,7 @@ public class EncoderFactory {
     }
   }
   
-  public static <E extends Enum<E>> AbstractEncoder<E, Long> getLongEncoder(Class<E> pEnum, boolean pUseCompression) {
+  public static <E extends Enum<E>> AEncoder<E, Long> getLongEncoder(Class<E> pEnum, boolean pUseCompression) {
     if(pUseCompression) {
       return new CompressedEncoder<E, Long>(pEnum, LONG_ENCODER_PROPERTIES);
     } else {
@@ -20,7 +20,7 @@ public class EncoderFactory {
     }
   }
   
-  public static <E extends Enum<E>> AbstractEncoder<E, Boolean> getBooleanEncoder(Class<E> pEnum) {
+  public static <E extends Enum<E>> AEncoder<E, Boolean> getBooleanEncoder(Class<E> pEnum) {
     return new BitEncoder<E>(pEnum);
   }
 

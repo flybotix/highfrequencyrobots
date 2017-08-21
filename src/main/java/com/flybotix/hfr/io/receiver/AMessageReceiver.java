@@ -37,8 +37,8 @@ import com.flybotix.hfr.util.log.Logger;
  * If Class<T> equals the decoded object's class, then any listener who was added to this class will
  * be notified of the incoming message (which is of type <T>).
  */
-public abstract class AbstractMessageReceiver <T> extends Delegator<T> implements IDataReceiver {
-  private ILog mLog = Logger.createLog(AbstractMessageReceiver.class);
+public abstract class AMessageReceiver <T> extends Delegator<T> implements IDataReceiver {
+  private ILog mLog = Logger.createLog(AMessageReceiver.class);
   protected final Map<Integer, MessageQueue> mMessageQ = new HashMap<>();
   protected final Map<Integer, IMessageParser<?>> mMessageParsers = new HashMap<>();
   protected long mDecodeRateMs = 5;
@@ -47,7 +47,7 @@ public abstract class AbstractMessageReceiver <T> extends Delegator<T> implement
     Executors.newCachedThreadPool(r -> new Thread(r, "Message Queue Decoding Thread"));
   
   
-  public AbstractMessageReceiver(final Class<T> pType) {
+  public AMessageReceiver(final Class<T> pType) {
     
     // Start the polling thread which pulls messages off the queue and pushes them to the
     // parser/listeners

@@ -1,12 +1,10 @@
 package com.flybotix.hfr;
 
-import java.util.Arrays;
-
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.DefaultCodexReceiver;
+import com.flybotix.hfr.codex.encode.AEncoder;
+import com.flybotix.hfr.codex.encode.EncoderFactory;
 import com.flybotix.hfr.io.PassthroughTransport;
-import com.flybotix.hfr.io.encode.AbstractEncoder;
-import com.flybotix.hfr.io.encode.EncoderFactory;
 
 public class Passthroughtest {
 
@@ -16,7 +14,7 @@ public class Passthroughtest {
       data.put(e, e.ordinal() * 10d);
     }
     
-    AbstractEncoder<ETestData, Double> enc = EncoderFactory.getDoubleEncoder(ETestData.class, true);
+    AEncoder<ETestData, Double> enc = EncoderFactory.getDoubleEncoder(ETestData.class, true);
     DefaultCodexReceiver<ETestData, Double> dcr = new DefaultCodexReceiver<>(enc);
     PassthroughTransport pt = new PassthroughTransport();
     pt.addParserForMessageType(ETestData.class, dcr);

@@ -1,9 +1,10 @@
 package com.flybotix.hfr.io.receiver;
 
+import com.flybotix.hfr.io.ConnectionStatus;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
-public abstract class AbstractSocketReceiver extends AbstractMessageReceiver<ConnectionStatus> {
+public abstract class ASocketReceiver extends AMessageReceiver<ConnectionStatus> {
   
   public enum ESocketType {
     SERVER,
@@ -13,11 +14,11 @@ public abstract class AbstractSocketReceiver extends AbstractMessageReceiver<Con
   
   protected final ESocketType mType;
   protected final ConnectionStatus mStatus;
-  private ILog mLog = Logger.createLog(AbstractSocketReceiver.class);
+  private ILog mLog = Logger.createLog(ASocketReceiver.class);
   protected int mPort;
   protected String mIpAddress;
   
-  public AbstractSocketReceiver(ESocketType pType) {
+  public ASocketReceiver(ESocketType pType) {
     super(ConnectionStatus.class);
     mType = pType;
     mStatus = new ConnectionStatus(mType);

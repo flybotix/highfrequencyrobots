@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.DefaultCodexReceiver;
-import com.flybotix.hfr.io.encode.AbstractEncoder;
-import com.flybotix.hfr.io.encode.EncoderFactory;
-import com.flybotix.hfr.io.receiver.AbstractSocketReceiver.ESocketType;
+import com.flybotix.hfr.codex.encode.AEncoder;
+import com.flybotix.hfr.codex.encode.EncoderFactory;
+import com.flybotix.hfr.io.receiver.ASocketReceiver.ESocketType;
 import com.flybotix.hfr.io.receiver.TCPReceiver;
 
 public class TestClientReceiver {
@@ -16,7 +16,7 @@ public class TestClientReceiver {
   private static Codex<ETestData, Double> latest = null; 
   
   public static void main(String[] pArgs) {
-    AbstractEncoder<ETestData, Double> enc = EncoderFactory.getDoubleEncoder(ETestData.class, true);
+    AEncoder<ETestData, Double> enc = EncoderFactory.getDoubleEncoder(ETestData.class, true);
     DefaultCodexReceiver<ETestData, Double> codexRecv = new DefaultCodexReceiver<>(enc);
     codexRecv.addListener(codex -> System.out.println(codex));
     testReceiptViaTCP(codexRecv);

@@ -1,4 +1,4 @@
-package com.flybotix.hfr.io.encode;
+package com.flybotix.hfr.codex.encode;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -8,14 +8,14 @@ import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.io.receiver.IMessageParser;
 
-public abstract class AbstractEncoder <E extends Enum<E>, V>{
+public abstract class AEncoder <E extends Enum<E>, V>{
 
   private final Class<E> mEnumClass;
   protected final EnumSet<E> mEnums;
   protected final int mLength;
   protected final int mBitSetByteLength;
   
-  public AbstractEncoder(Class<E> pEnum) {
+  public AEncoder(Class<E> pEnum) {
     mEnumClass = pEnum;
     mEnums = EnumSet.allOf(pEnum);
     mLength = mEnums.size();

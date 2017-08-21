@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
-public class UDPReceiver extends AbstractSocketReceiver {
+public class UDPReceiver extends ASocketReceiver {
 
   private int mMaxBufferSize = 0;
   private DatagramSocket mSocket = null;
@@ -38,7 +38,7 @@ public class UDPReceiver extends AbstractSocketReceiver {
     byte[] buffer = new byte[mMaxBufferSize];
     DatagramPacket incoming = new DatagramPacket(buffer, mMaxBufferSize);
 
-    while (mStatus.mIsConnected && mSocket != null) {
+    while (mStatus.isConnected() && mSocket != null) {
       try {
         mSocket.receive(incoming);
         update(mStatus.periodicUpdate(true));

@@ -5,11 +5,11 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
-import com.flybotix.hfr.io.receiver.AbstractMessageReceiver;
+import com.flybotix.hfr.io.receiver.AMessageReceiver;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
-public class PassthroughTransport extends AbstractMessageReceiver<Double>{
+public class PassthroughTransport extends AMessageReceiver<Double>{
   public PassthroughTransport() {
     super(Double.class);
   }

@@ -2,21 +2,21 @@ package com.flybotix.hfr.codex;
 
 import java.util.Arrays;
 
-import com.flybotix.hfr.io.encode.AbstractEncoder;
+import com.flybotix.hfr.codex.encode.AEncoder;
 
 /**
  * It's like an enum map, but with less safety and better performance.
  */
 public class Codex <E extends Enum<E>, V>{
   private CodexMetadata<E> mMeta;
-  private final AbstractEncoder<E, V> mEncoder;
+  private final AEncoder<E, V> mEncoder;
   private V[] mData;
   
-  public Codex(AbstractEncoder<E, V> pEncoder) {
+  public Codex(AEncoder<E, V> pEncoder) {
     this(pEncoder, CodexMetadata.empty(pEncoder.getEnum()));
   }
   
-  public Codex(AbstractEncoder<E, V> pEncoder, CodexMetadata<E> pMeta) {
+  public Codex(AEncoder<E, V> pEncoder, CodexMetadata<E> pMeta) {
     mData = pEncoder.generateEmptyArray();
     mMeta = pMeta;
     mEncoder = pEncoder;

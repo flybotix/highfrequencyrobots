@@ -1,4 +1,4 @@
-package com.flybotix.hfr.io.receiver;
+package com.flybotix.hfr.io;
 
 import java.awt.Color;
 

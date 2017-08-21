@@ -1,8 +1,8 @@
-package com.flybotix.hfr.io.receiver;
+package com.flybotix.hfr.io;
 
 import java.time.Instant;
 
-import com.flybotix.hfr.io.receiver.AbstractSocketReceiver.ESocketType;
+import com.flybotix.hfr.io.receiver.ASocketReceiver.ESocketType;
 
 public class ConnectionStatus {
   private final ESocketType mType;

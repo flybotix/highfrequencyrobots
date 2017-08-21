@@ -2,7 +2,7 @@ package com.flybotix.hfr.codex;
 
 import java.nio.ByteBuffer;
 
-import com.flybotix.hfr.io.encode.AbstractEncoder;
+import com.flybotix.hfr.codex.encode.AEncoder;
 import com.flybotix.hfr.io.receiver.IMessageParser;
 import com.flybotix.hfr.util.lang.Delegator;
 
@@ -25,9 +25,9 @@ import com.flybotix.hfr.util.lang.Delegator;
  */
 public class DefaultCodexReceiver<E extends Enum<E>, V> extends Delegator<Codex<E,V>> implements IMessageParser<Codex<E,V>> {
 
-  protected final AbstractEncoder<E, V> mEncoder;
+  protected final AEncoder<E, V> mEncoder;
 
-  public DefaultCodexReceiver(AbstractEncoder<E, V> pEncoder) {
+  public DefaultCodexReceiver(AEncoder<E, V> pEncoder) {
     mEncoder = pEncoder;
   }
   

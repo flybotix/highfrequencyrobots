@@ -1,4 +1,4 @@
-package com.flybotix.hfr.io.encode;
+package com.flybotix.hfr.codex.encode;
 
 import java.nio.ByteBuffer;
 

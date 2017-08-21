@@ -1,74 +1,36 @@
 package com.flybotix.hfr.io.sender;
 
-import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-import com.flybotix.hfr.io.MessageQueue;
-import com.flybotix.hfr.io.receiver.AbstractSocketReceiver.ESocketType;
-import com.flybotix.hfr.io.receiver.ConnectionStatus;
-import com.flybotix.hfr.util.lang.Delegator;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
-public class TCPSender extends Delegator<ConnectionStatus> implements Runnable {
-  protected int mPort;
-  protected String mIpAddress;
+public class TCPSender extends ADataSender {
   protected Socket mClientSocket;
-  protected Semaphore mSocketLock = new Semaphore(0, true);;
-  protected final ConnectionStatus mStatus = new ConnectionStatus(ESocketType.CLIENT);
-  private final MessageQueue mMessageQ = new MessageQueue();
+  protected Semaphore mSocketLock = new Semaphore(1, true);
   private DataOutputStream writer = null;
+  
+  private final Executor mThreads = Executors.newFixedThreadPool(2);
 
   private ILog mLog = Logger.createLog(TCPSender.class);
   
-  public void sendMessage(int pId, byte[] pMessage) {
-    ByteBuffer bb = ByteBuffer.allocate(Integer.BYTES + Integer.BYTES + pMessage.length);
-    bb.putInt(pId);
-    bb.putInt(pMessage.length);
-    bb.put(pMessage);
-    mLog.debug("Adding message " + pId + " with size " + pMessage.length);
-    try {
-      mMessageQ.add(bb);
-    } catch (InterruptedException e) {
-      mLog.error("Dropping message of type " + pId);
-      mLog.exception(e);
-    }
-  }
-  
-  public void setPort(int pPort) {
-    mPort = pPort;
-  }
-  
-  public void setIpAddress(String pAddress) {
-    mIpAddress = pAddress;
-  }
-  
-  public final void connect() {
-    establishConnection();
-    Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnect()));
-  }
-  
-  public void disconnect() {
-    update(mStatus.expectedDisconnect());
-  }
-
-  
-  protected void establishConnection() {
-    new Thread(() -> {
-      while(!mStatus.isConnected()) {
+  @Override
+  protected void establishConnection(InetAddress addr) {
+    mThreads.execute(() -> {
+      while(!mStatus.isConnected() && !mStatus.isIntentionallyDisconnected()) {
         try {
           mSocketLock.acquire();
-          InetAddress addr = InetAddress.getByName(mIpAddress);
           mLog.debug("Inet Addr:" + addr);
           mClientSocket = new Socket(addr, mPort);
           mLog.debug("Client Established");
@@ -82,6 +44,7 @@ public class TCPSender extends Delegator<ConnectionStatus> implements Runnable {
             e.printStackTrace();
           } 
           update(mStatus.connectionEstablished());
+          startReadTask();
         } catch (ConnectException ce) {
           mLog.error("Error Connecting to ", mIpAddress, ":", mPort);
           update(mStatus.errorDuringAttempt());
@@ -94,7 +57,6 @@ public class TCPSender extends Delegator<ConnectionStatus> implements Runnable {
           }
         } catch (IOException e) {
           mSocketLock.release();
-
           mLog.error("Error Connecting to ", mIpAddress, ":", mPort);
           mLog.exception(e);
           update(mStatus.errorDuringAttempt());
@@ -103,47 +65,48 @@ public class TCPSender extends Delegator<ConnectionStatus> implements Runnable {
         }
       }
       mLog.warn("Finished connecting to remote.");
-    }).start();
+    });
   }
-  
-  @Override
-  public void run() {
-    while(!mStatus.isIntentionallyDisconnected()) {
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-      }
-      try {
-        while (mStatus.isConnected() && !mClientSocket.isClosed()) {
-          try {
-            List<ByteBuffer> messages = mMessageQ.removeAll();
-            for(ByteBuffer bb : messages) {
-              mLog.debug("Writing message.");
-              byte[] array = bb.array();
-              mLog.debug(Arrays.toString(array));
-              writer.write(array);
-              writer.flush();
-            }
-          } catch (Exception e) {
-            update(mStatus.unexpectedDisconnect());
-            mLog.exception(e);
-            break;
-          }
-          Thread.sleep(50);
-        }
-      } catch (Exception e) {
-        mLog.exception(e);
-        update(mStatus.unexpectedDisconnect());
-      } finally {
-        mSocketLock.release();// release mutex
+
+  private void startReadTask() {
+    mThreads.execute(() -> {
+      while(!mStatus.isIntentionallyDisconnected()) {
         try {
-          if (mClientSocket != null) {
-            mClientSocket.close();
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+        try {
+          while (mStatus.isConnected() && !mClientSocket.isClosed()) {
+            try {
+              List<ByteBuffer> messages = mMessageQ.removeAll();
+              for(ByteBuffer bb : messages) {
+                mLog.debug("Writing message.");
+                byte[] array = bb.array();
+                mLog.debug(Arrays.toString(array));
+                writer.write(array);
+                writer.flush();
+              }
+            } catch (Exception e) {
+              update(mStatus.unexpectedDisconnect());
+              mLog.exception(e);
+              break;
+            }
+            Thread.sleep(50);
           }
-        } catch (IOException e) {
+        } catch (Exception e) {
           mLog.exception(e);
+          update(mStatus.unexpectedDisconnect());
+        } finally {
+          mSocketLock.release();// release mutex
+          try {
+            if (mClientSocket != null) {
+              mClientSocket.close();
+            }
+          } catch (IOException e) {
+            mLog.exception(e);
+          }
         }
       }
-    }
+    });
   }
 }

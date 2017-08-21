@@ -2,9 +2,6 @@ package com.flybotix.hfr.io.receiver;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -17,7 +14,7 @@ import java.util.concurrent.Semaphore;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
-public class TCPReceiver extends AbstractSocketReceiver {
+public class TCPReceiver extends ASocketReceiver {
 
   protected Socket mClientSocket;
   private ServerSocket mServerSocket;
@@ -56,7 +53,7 @@ public class TCPReceiver extends AbstractSocketReceiver {
         e.printStackTrace();
       } // create reader to read data from client
 
-      while (mStatus.mIsConnected && !mClientSocket.isClosed()) {
+      while (mStatus.isConnected() && !mClientSocket.isClosed()) {
         try {
           read(lnDataFromServer);
           update(mStatus.periodicUpdate(mClientSocket.isConnected()));

@@ -1,4 +1,4 @@
-package com.flybotix.hfr.io.encode;
+package com.flybotix.hfr.codex.encode;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -6,7 +6,7 @@ import java.util.BitSet;
 
 import com.flybotix.hfr.codex.Codex;
 
-public class BitEncoder <E extends Enum<E>> extends AbstractEncoder<E, Boolean>{
+public class BitEncoder <E extends Enum<E>> extends AEncoder<E, Boolean>{
 
   public BitEncoder(Class<E> pEnum) {
     super(pEnum);
