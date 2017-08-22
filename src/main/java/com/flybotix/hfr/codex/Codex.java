@@ -7,16 +7,19 @@ import com.flybotix.hfr.codex.encode.AEncoder;
 /**
  * It's like an enum map, but with less safety and better performance.
  */
-public class Codex <E extends Enum<E>, V>{
+public class Codex <V, E extends Enum<E> & Type<V>>{
+  
   private CodexMetadata<E> mMeta;
-  private final AEncoder<E, V> mEncoder;
+  private final AEncoder<V, E> mEncoder;
   private V[] mData;
   
-  public Codex(AEncoder<E, V> pEncoder) {
+  public static final CodexFactory of = CodexFactory.inst();
+  
+  public Codex(AEncoder<V, E> pEncoder) {
     this(pEncoder, CodexMetadata.empty(pEncoder.getEnum()));
   }
   
-  public Codex(AEncoder<E, V> pEncoder, CodexMetadata<E> pMeta) {
+  public Codex(AEncoder<V, E> pEncoder, CodexMetadata<E> pMeta) {
     mData = pEncoder.generateEmptyArray();
     mMeta = pMeta;
     mEncoder = pEncoder;
@@ -24,6 +27,10 @@ public class Codex <E extends Enum<E>, V>{
   
   public CodexMetadata<E> meta() {
     return mMeta;
+  }
+  
+  public byte[] encode() {
+    return mEncoder.encode(this);
   }
 
   public void setMetadata(CodexMetadata<E> pMeta) {
@@ -45,7 +52,7 @@ public class Codex <E extends Enum<E>, V>{
 
   @SuppressWarnings("unchecked")
   public boolean equals(Object pOther) {
-    Codex<E, V> o = (Codex<E, V>)pOther;
+    Codex<V, E> o = (Codex<V, E>)pOther;
     return Arrays.equals(o.mData, mData);
   }
   
@@ -79,5 +86,4 @@ public class Codex <E extends Enum<E>, V>{
     return codex;
   }
   
-  public static final CodexFactory of = CodexFactory.inst();
 }

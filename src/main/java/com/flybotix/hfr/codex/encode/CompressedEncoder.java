@@ -4,13 +4,13 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexHash;
-import com.flybotix.hfr.codex.CodexMetadata;
+import com.flybotix.hfr.codex.Type;
+import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
-public class CompressedEncoder <E extends Enum<E>, V> extends DefaultEncoder<E, V> {
+public class CompressedEncoder <V, E extends Enum<E> & Type<V>> extends DefaultEncoder<V, E> {
   private static final ILog mLog = Logger.createLog(CompressedEncoder.class);
 
   public CompressedEncoder(Class<E> pEnum, IEncoderProperties<V> pProps) {
@@ -23,7 +23,7 @@ public class CompressedEncoder <E extends Enum<E>, V> extends DefaultEncoder<E, 
   }
 
   @Override
-  protected Codex<E, V> decodeImpl(ByteBuffer pData) {
+  protected Codex<V, E> decodeImpl(ByteBuffer pData) {
     int length = pData.remaining();
     int initPos = pData.position();
 
@@ -41,7 +41,7 @@ public class CompressedEncoder <E extends Enum<E>, V> extends DefaultEncoder<E, 
       decoded[i] = mProps.decodeSingle(pData);
     }
 
-    Codex<E, V> result = new Codex<E, V>(this);
+    Codex<V, E> result = new Codex<V, E>(this);
     int dataidx = 0;
     for(int e = 0; e < mLength; e++) {
       if(hash.get(e)) {
@@ -53,7 +53,7 @@ public class CompressedEncoder <E extends Enum<E>, V> extends DefaultEncoder<E, 
   }
 
   @Override
-  protected byte[] encodeImpl(Codex<E, V> pData) {
+  protected byte[] encodeImpl(Codex<V, E> pData) {
     CodexHash hash = pData.hash();
     byte[] bsbytes = hash.getBitSet().toByteArray();
     mLog.debug("Bitset: " + Arrays.toString(bsbytes));

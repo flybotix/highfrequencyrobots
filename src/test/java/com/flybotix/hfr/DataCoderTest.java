@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.Type;
 import com.flybotix.hfr.codex.encode.AEncoder;
 import com.flybotix.hfr.codex.encode.EncoderFactory;
 
@@ -29,7 +30,7 @@ public class DataCoderTest {
     }
   }
   
-  private enum TEST {
+  private enum TEST implements Type<Double>{
     A,B,C,D,E,
     F,G,H,I,J,
     K,L,M,N,O,
@@ -55,8 +56,8 @@ public class DataCoderTest {
     return sparsity.stream();
   }
   
-  private static Codex<TEST, Double> getRandomArray(double pProbOfData, AEncoder<TEST, Double> pCoder) {
-    Codex<TEST, Double> res = new Codex<>(pCoder);
+  private static Codex<Double, TEST> getRandomArray(double pProbOfData, AEncoder<Double, TEST> pCoder) {
+    Codex<Double, TEST> res = new Codex<>(pCoder);
     for(TEST t : pCoder.getEnums()) {
       if(Math.random() <= pProbOfData) { 
         res.put(t, Math.random() * 1024d);
@@ -67,13 +68,13 @@ public class DataCoderTest {
   
   private static boolean verifyCompressionAlgorithm() {
     System.out.println("Verifying Array Integrity.");
-    AEncoder<TEST, Double> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
+    AEncoder<Double, TEST> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
     for(double s = 0.05; s < 1.0; s+= 0.05){
       nonsparse = s;
-      Codex<TEST, Double> random = getRandomArray(nonsparse, dc);
+      Codex<Double, TEST> random = getRandomArray(nonsparse, dc);
       byte[] bytes = dc.encode(random);
       if(bytes.length > 0) {
-        Codex<TEST, Double> decoded = dc.decode(ByteBuffer.wrap(bytes));
+        Codex<Double, TEST> decoded = dc.decode(ByteBuffer.wrap(bytes));
 //        if(!Arrays.equals(random, decoded)) {
         System.out.println(random);
         System.out.println(decoded);
@@ -116,15 +117,15 @@ public class DataCoderTest {
   }
   
   private static void testRaw(Result r) {
-//    AbstractEncoder<TEST, Double> dc = new UncompressedDoubleEncoder<>(TEST.class);
-    AEncoder<TEST, Double> dc = EncoderFactory.getDoubleEncoder(TEST.class, false);
-    Map<Integer, Codex<TEST, Double>> input = new HashMap<>();
+//    AbstractEncoder<Double, TEST> dc = new UncompressedDoubleEncoder<>(TEST.class);
+    AEncoder<Double, TEST> dc = EncoderFactory.getDoubleEncoder(TEST.class, false);
+    Map<Integer, Codex<Double, TEST>> input = new HashMap<>();
     for(Integer i = 0; i < numIters; i++) {
       input.put(i, getRandomArray(nonsparse, dc));
     }
     r.nonsparse = nonsparse;
     
-    Map<Integer, Codex<TEST, Double>> output = new HashMap<>();
+    Map<Integer, Codex<Double, TEST>> output = new HashMap<>();
     Map<Integer, byte[]> transmitted = new HashMap<>();
     
     long start = System.nanoTime();
@@ -155,14 +156,14 @@ public class DataCoderTest {
   }
   
   private static void testCompressed(Result r) {
-    AEncoder<TEST, Double> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
-    Map<Integer, Codex<TEST, Double>> input = new HashMap<>();
+    AEncoder<Double, TEST> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
+    Map<Integer, Codex<Double, TEST>> input = new HashMap<>();
     for(Integer i = 0; i < numIters; i++) {
       input.put(i, getRandomArray(nonsparse, dc));
     }
     r.nonsparse = nonsparse;
 
-    Map<Integer, Codex<TEST, Double>> output = new HashMap<>();
+    Map<Integer, Codex<Double, TEST>> output = new HashMap<>();
     Map<Integer, byte[]> transmitted = new HashMap<>();
     
     long start = System.nanoTime();

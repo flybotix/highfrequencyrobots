@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 
 import com.flybotix.hfr.io.ConnectionStatus;
 import com.flybotix.hfr.io.MessageQueue;
-import com.flybotix.hfr.io.receiver.ASocketReceiver.ESocketType;
 import com.flybotix.hfr.util.lang.Delegator;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -16,7 +15,7 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
   protected int mDestPort;
   protected int mHostPort;
   protected String mDestAddress;
-  protected final ConnectionStatus mStatus = new ConnectionStatus(ESocketType.CLIENT);
+  protected final ConnectionStatus mStatus = new ConnectionStatus();
   private boolean mIsRegisteredWithShutdown = false;
 
   private ILog mLog = Logger.createLog(ADataSender.class);

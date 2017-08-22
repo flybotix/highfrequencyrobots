@@ -1,8 +1,9 @@
 package com.flybotix.hfr.codex.encode;
 
 import com.flybotix.hfr.codex.CodexMetadata;
+import com.flybotix.hfr.codex.Type;
 
-public abstract class DefaultEncoder <E extends Enum<E>, V> extends AEncoder<E, V> {
+public abstract class DefaultEncoder <V, E extends Enum<E> & Type<V>> extends AEncoder<V, E> {
 
   protected final IEncoderProperties<V> mProps;
   

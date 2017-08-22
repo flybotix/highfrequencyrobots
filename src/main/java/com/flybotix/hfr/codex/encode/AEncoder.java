@@ -1,14 +1,13 @@
 package com.flybotix.hfr.codex.encode;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.EnumSet;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexMetadata;
-import com.flybotix.hfr.io.receiver.IMessageParser;
+import com.flybotix.hfr.codex.Type;
+import com.flybotix.hfr.codex.Codex;
 
-public abstract class AEncoder <E extends Enum<E>, V>{
+public abstract class AEncoder <V, E extends Enum<E> & Type<V>>{
 
   private final Class<E> mEnumClass;
   protected final EnumSet<E> mEnums;
@@ -34,21 +33,21 @@ public abstract class AEncoder <E extends Enum<E>, V>{
   public abstract V getDefaultValue();
   public abstract V[] generateEmptyArray();
   
-  public byte[] encode(Codex<E, V> pData) {
+  public byte[] encode(Codex<V, E> pData) {
     byte[] body = encodeImpl(pData);
     byte[] header = pData.meta().encode();
     
     return ByteBuffer.allocate(header.length + body.length).put(header).put(body).array();
   }
   
-  public Codex<E, V> decode(ByteBuffer pData) {
+  public Codex<V,E> decode(ByteBuffer pData) {
     CodexMetadata<E> header = CodexMetadata.parse(mEnumClass, pData);
-    Codex<E,V> body = decodeImpl(pData);
+    Codex<V, E> body = decodeImpl(pData);
     body.setMetadata(header);
     return body;
   }
   
-  protected abstract Codex<E, V> decodeImpl(ByteBuffer pData);
+  protected abstract Codex<V, E> decodeImpl(ByteBuffer pData);
   
-  protected abstract byte[] encodeImpl(Codex<E, V> pData);
+  protected abstract byte[] encodeImpl(Codex<V, E> pData);
 }

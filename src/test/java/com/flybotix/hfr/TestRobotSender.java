@@ -16,16 +16,16 @@ public class TestRobotSender {
 
   public static void main(String[] pArgs) throws Exception{
     Logger.setLevel(ELevel.INFO);
-    Codex<ETestData, Double> data = Codex.of.doubles(ETestData.class);
+    Codex<Double, ETestData> data = Codex.of.doubles(ETestData.class);
     for(ETestData e : ETestData.values()) {
       data.put(e, e.ordinal() * 10d * Math.PI);
     }
-    final AEncoder<ETestData, Double> enc = EncoderFactory.getDoubleEncoder(ETestData.class, true);
+    final AEncoder<Double, ETestData> enc = EncoderFactory.getDoubleEncoder(ETestData.class, true);
     System.out.println("Sending " + data);
     
     
-    ISendProtocol isp = Protocols.createSender(EProtocol.UDP, 7778, 7777, "localhost");
-//    ISendProtocol isp = Protocols.createSender(EProtocol.TCP, 7778, 7777, "localhost");
+//    ISendProtocol isp = Protocols.createSender(EProtocol.UDP, 7778, 7777, "localhost");
+    ISendProtocol isp = Protocols.createSender(EProtocol.TCP, 7778, 7777, "localhost");
     isp.addListener(update->LOG.debug(update));
     isp.sendMessage(ETestData.class.hashCode(), enc.encode(data));
   }

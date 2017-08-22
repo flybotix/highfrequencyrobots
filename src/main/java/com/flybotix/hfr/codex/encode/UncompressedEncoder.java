@@ -3,8 +3,9 @@ package com.flybotix.hfr.codex.encode;
 import java.nio.ByteBuffer;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.Type;
 
-public class UncompressedEncoder <E extends Enum<E>, V> extends DefaultEncoder<E, V> {
+public class UncompressedEncoder <V, E extends Enum<E> & Type<V>> extends DefaultEncoder<V, E> {
 
   public UncompressedEncoder(Class<E> pEnum, IEncoderProperties<V> pProps) {
     super(pEnum, pProps);
@@ -16,8 +17,8 @@ public class UncompressedEncoder <E extends Enum<E>, V> extends DefaultEncoder<E
   }
 
   @Override
-  protected Codex<E, V> decodeImpl(ByteBuffer pData) {
-    Codex<E, V> result = new Codex<>(this);
+  protected Codex<V, E> decodeImpl(ByteBuffer pData) {
+    Codex<V, E> result = new Codex<>(this);
     for(int dataidx = 0; dataidx < mLength; dataidx++) {
       result.put(dataidx, mProps.decodeSingle(pData));
     }
@@ -25,7 +26,7 @@ public class UncompressedEncoder <E extends Enum<E>, V> extends DefaultEncoder<E
   }
 
   @Override
-  protected byte[] encodeImpl(Codex<E, V> pData) {
+  protected byte[] encodeImpl(Codex<V, E> pData) {
     ByteBuffer bb = ByteBuffer.allocate(mProps.sizeOfSingle() * mLength);
     for(int dataidx = 0; dataidx < mLength; dataidx++) {
       mProps.encodeSingle(bb, pData.get(dataidx));

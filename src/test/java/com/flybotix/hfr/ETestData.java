@@ -1,6 +1,8 @@
 package com.flybotix.hfr;
 
-public enum ETestData {
+import com.flybotix.hfr.codex.Type;
+
+public enum ETestData implements Type<Double>{
   pdb0,
   pdb1,
   pdb2,
@@ -10,6 +12,7 @@ public enum ETestData {
   pdb6,
   pdb7,
   vrm0,
-  totalcurrent,
+  totalcurrent,;
+
   
 }

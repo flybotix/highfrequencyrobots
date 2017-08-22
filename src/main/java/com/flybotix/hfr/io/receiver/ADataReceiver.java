@@ -38,17 +38,20 @@ import com.flybotix.hfr.util.log.Logger;
  * If Class<T> equals the decoded object's class, then any listener who was added to this class will
  * be notified of the incoming message (which is of type <T>).
  */
-public abstract class AMessageReceiver <T> extends Delegator<T> implements IReceiveProtocol {
-  private ILog mLog = Logger.createLog(AMessageReceiver.class);
+public abstract class ADataReceiver <T> extends Delegator<T> implements IReceiveProtocol {
+  private ILog mLog = Logger.createLog(ADataReceiver.class);
   protected final Map<Integer, MessageQueue> mMessageQ = new HashMap<>();
   protected final Map<Integer, IMessageParser<?>> mMessageParsers = new HashMap<>();
   protected long mDecodeRateMs = 5;
+  private boolean mIsRegisteredWithShutdown = false;
+  protected int mHostPort;
+  protected String mHostInfo;
   
   private static final Executor sRECEIVER_THREADS = 
     Executors.newCachedThreadPool(r -> new Thread(r, "Message Queue Decoding Thread"));
   
   
-  public AMessageReceiver(final Class<T> pType) {
+  public ADataReceiver(final Class<T> pType) {
     
     // Start the polling thread which pulls messages off the queue and pushes them to the
     // parser/listeners
@@ -117,4 +120,30 @@ public abstract class AMessageReceiver <T> extends Delegator<T> implements IRece
       mLog.exception(e);
     }
   }
+
+  @Override
+  public final void connect() {
+    establishConnection();
+    if(!mIsRegisteredWithShutdown) {
+      Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnect()));
+      mIsRegisteredWithShutdown = true;
+    }
+  }
+
+  @Override
+  public void disconnect() {
+    // noop by default
+  }
+  
+  @Override
+  public void setHostPort(int pPort) {
+    mHostPort = pPort;
+  }
+  
+  @Override
+  public void setHostInfo(String pInfo) {
+    mHostInfo = pInfo;
+  }
+  
+  protected abstract void establishConnection();
 }

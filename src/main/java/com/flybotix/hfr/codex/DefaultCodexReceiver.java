@@ -23,17 +23,17 @@ import com.flybotix.hfr.util.lang.Delegator;
  * @param <E>
  * @param <V>
  */
-public class DefaultCodexReceiver<E extends Enum<E>, V> extends Delegator<Codex<E,V>> implements IMessageParser<Codex<E,V>> {
+public class DefaultCodexReceiver<V, E extends Enum<E> & Type<V>> extends Delegator<Codex<V, E>> implements IMessageParser<Codex<V, E>> {
 
-  protected final AEncoder<E, V> mEncoder;
+  protected final AEncoder<V, E> mEncoder;
 
-  public DefaultCodexReceiver(AEncoder<E, V> pEncoder) {
+  public DefaultCodexReceiver(AEncoder<V, E> pEncoder) {
     mEncoder = pEncoder;
   }
   
   @Override
-  public Codex<E,V> read(ByteBuffer pData) {
-    Codex<E,V> codex = mEncoder.decode(pData);
+  public Codex<V, E> read(ByteBuffer pData) {
+    Codex<V, E> codex = mEncoder.decode(pData);
     update(codex);
     return codex;
   }

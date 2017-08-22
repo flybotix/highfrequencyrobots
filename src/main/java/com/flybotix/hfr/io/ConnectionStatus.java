@@ -2,10 +2,7 @@ package com.flybotix.hfr.io;
 
 import java.time.Instant;
 
-import com.flybotix.hfr.io.receiver.ASocketReceiver.ESocketType;
-
 public class ConnectionStatus {
-  private final ESocketType mType;
   EConnectionState mState = EConnectionState.DISCONNECTED;
   boolean mIsConnected = false;
   boolean mIsIntentionallyDisconnected = false;
@@ -14,14 +11,6 @@ public class ConnectionStatus {
   private Instant mConnectionEstablishedAt = null;
   private Instant mLatestConnectionHeartbeat = null;
   private Instant mLatestDisconnect = null;
-  
-  public ConnectionStatus(ESocketType pType) {
-    mType = pType;
-  }
-  
-  public ESocketType getType() {
-    return mType;
-  }
   
   public EConnectionState getState() {
     return mState;

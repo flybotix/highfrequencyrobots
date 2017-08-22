@@ -5,8 +5,9 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.Type;
 
-public class BitEncoder <E extends Enum<E>> extends AEncoder<E, Boolean>{
+public class BitEncoder <E extends Enum<E> & Type<Boolean>> extends AEncoder<Boolean, E>{
 
   public BitEncoder(Class<E> pEnum) {
     super(pEnum);
@@ -30,13 +31,13 @@ public class BitEncoder <E extends Enum<E>> extends AEncoder<E, Boolean>{
   }
 
   @Override
-  protected Codex<E, Boolean> decodeImpl(ByteBuffer pData) {
+  protected Codex<Boolean, E> decodeImpl(ByteBuffer pData) {
     // reference BitSet.toByteArray() for this calculation
     byte[] bsarray = new byte[getBufferSizeInBytes()];
     pData.get(bsarray);
     BitSet hash = BitSet.valueOf(bsarray);
     hash.set(mLength);
-    Codex<E, Boolean> result = new Codex<>(this);
+    Codex<Boolean, E> result = new Codex<>(this);
     for(int i = 0; i < mLength; i++) {
       result.put(i, hash.get(i));
     }
@@ -44,7 +45,7 @@ public class BitEncoder <E extends Enum<E>> extends AEncoder<E, Boolean>{
   }
 
   @Override
-  protected byte[] encodeImpl(Codex<E, Boolean> pData) {
+  protected byte[] encodeImpl(Codex<Boolean, E> pData) {
     BitSet result = new BitSet(pData.length());
     for(int i = 0; i < pData.length(); i++) {
       if(pData.get(i)) {
