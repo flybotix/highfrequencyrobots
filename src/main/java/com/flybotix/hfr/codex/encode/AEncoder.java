@@ -4,10 +4,10 @@ import java.nio.ByteBuffer;
 import java.util.EnumSet;
 
 import com.flybotix.hfr.codex.CodexMetadata;
-import com.flybotix.hfr.codex.ICodexType;
+import com.flybotix.hfr.codex.CodexOf;
 import com.flybotix.hfr.codex.Codex;
 
-public abstract class AEncoder <V, E extends Enum<E> & ICodexType<V>>{
+public abstract class AEncoder <V, E extends Enum<E> & CodexOf<V>>{
 
   private final Class<E> mEnumClass;
   protected final EnumSet<E> mEnums;

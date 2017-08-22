@@ -24,7 +24,7 @@ import com.flybotix.hfr.util.lang.Delegator;
  * @param <E>
  * @param <V>
  */
-public class DefaultCodexReceiver<V, E extends Enum<E> & ICodexType<V>> extends Delegator<Codex<V, E>> implements IMessageParser<Codex<V, E>> {
+public class DefaultCodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<Codex<V, E>> implements IMessageParser<Codex<V, E>> {
 
   protected final AEncoder<V, E> mEncoder;
   

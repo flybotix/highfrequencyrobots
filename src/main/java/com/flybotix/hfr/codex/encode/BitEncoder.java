@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import com.flybotix.hfr.codex.Codex;
-import com.flybotix.hfr.codex.ICodexType;
+import com.flybotix.hfr.codex.CodexOf;
 
-public class BitEncoder <E extends Enum<E> & ICodexType<Boolean>> extends AEncoder<Boolean, E>{
+public class BitEncoder <E extends Enum<E> & CodexOf<Boolean>> extends AEncoder<Boolean, E>{
 
   public BitEncoder(Class<E> pEnum) {
     super(pEnum);
