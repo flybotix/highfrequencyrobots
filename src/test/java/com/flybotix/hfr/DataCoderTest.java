@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.CodexFactory;
 import com.flybotix.hfr.codex.CodexOf;
 import com.flybotix.hfr.codex.encode.AEncoder;
-import com.flybotix.hfr.codex.encode.EncoderFactory;
 
 public class DataCoderTest {
   
@@ -68,7 +68,7 @@ public class DataCoderTest {
   
   private static boolean verifyCompressionAlgorithm() {
     System.out.println("Verifying Array Integrity.");
-    AEncoder<Double, TEST> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
+    AEncoder<Double, TEST> dc = CodexFactory.getDoubleEncoder(TEST.class, true);
     for(double s = 0.05; s < 1.0; s+= 0.05){
       nonsparse = s;
       Codex<Double, TEST> random = getRandomArray(nonsparse, dc);
@@ -118,7 +118,7 @@ public class DataCoderTest {
   
   private static void testRaw(Result r) {
 //    AbstractEncoder<Double, TEST> dc = new UncompressedDoubleEncoder<>(TEST.class);
-    AEncoder<Double, TEST> dc = EncoderFactory.getDoubleEncoder(TEST.class, false);
+    AEncoder<Double, TEST> dc = CodexFactory.getDoubleEncoder(TEST.class, false);
     Map<Integer, Codex<Double, TEST>> input = new HashMap<>();
     for(Integer i = 0; i < numIters; i++) {
       input.put(i, getRandomArray(nonsparse, dc));
@@ -156,7 +156,7 @@ public class DataCoderTest {
   }
   
   private static void testCompressed(Result r) {
-    AEncoder<Double, TEST> dc = EncoderFactory.getDoubleEncoder(TEST.class, true);
+    AEncoder<Double, TEST> dc = CodexFactory.getDoubleEncoder(TEST.class, true);
     Map<Integer, Codex<Double, TEST>> input = new HashMap<>();
     for(Integer i = 0; i < numIters; i++) {
       input.put(i, getRandomArray(nonsparse, dc));

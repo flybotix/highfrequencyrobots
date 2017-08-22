@@ -1,8 +1,8 @@
 package com.flybotix.hfr;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.CodexFactory;
 import com.flybotix.hfr.codex.encode.AEncoder;
-import com.flybotix.hfr.codex.encode.EncoderFactory;
 import com.flybotix.hfr.io.Protocols;
 import com.flybotix.hfr.io.Protocols.EProtocol;
 import com.flybotix.hfr.io.sender.ISendProtocol;
@@ -20,7 +20,7 @@ public class TestRobotSender {
     for(ETestData e : ETestData.values()) {
       data.put(e, e.ordinal() * 10d * Math.PI);
     }
-    final AEncoder<Double, ETestData> enc = EncoderFactory.getDoubleEncoder(ETestData.class, true);
+    final AEncoder<Double, ETestData> enc = CodexFactory.getDoubleEncoder(ETestData.class, true);
     System.out.println("Sending " + data);
     
     

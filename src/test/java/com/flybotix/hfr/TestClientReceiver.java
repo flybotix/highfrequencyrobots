@@ -3,9 +3,9 @@ package com.flybotix.hfr;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.flybotix.hfr.codex.CodexFactory;
 import com.flybotix.hfr.codex.DefaultCodexReceiver;
 import com.flybotix.hfr.codex.encode.AEncoder;
-import com.flybotix.hfr.codex.encode.EncoderFactory;
 import com.flybotix.hfr.io.Protocols;
 import com.flybotix.hfr.io.Protocols.EProtocol;
 import com.flybotix.hfr.io.receiver.IMessageParser;
@@ -20,7 +20,7 @@ public class TestClientReceiver {
   
   public static void main(String[] pArgs) {
     Logger.setLevel(ELevel.INFO);
-    AEncoder<Double, ETestData> enc = EncoderFactory.getDoubleEncoder(ETestData.class, true);
+    AEncoder<Double, ETestData> enc = CodexFactory.getDoubleEncoder(ETestData.class, true);
     DefaultCodexReceiver<Double, ETestData> codexRecv = new DefaultCodexReceiver<>(enc);
     codexRecv.addListener(codex -> System.out.println(codex));
     
