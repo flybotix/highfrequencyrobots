@@ -1,6 +1,6 @@
 package com.flybotix.hfr;
 
-import com.flybotix.hfr.codex.DefaultCodexReceiver;
+import com.flybotix.hfr.codex.CodexReceiver;
 import com.flybotix.hfr.io.Protocols.EProtocol;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
@@ -13,9 +13,8 @@ public class TestClientReceiver {
   public static void main(String[] pArgs) {
     Logger.setLevel(ELevel.DEBUG);
     
-    DefaultCodexReceiver<Double, ETestData> codexRecv = new DefaultCodexReceiver<>(ETestData.class);
+    CodexReceiver<Double, ETestData> codexRecv = new CodexReceiver<>(ETestData.class);
     codexRecv.addListener(codex -> System.out.println(codex));
-    codexRecv.startReceiving(EProtocol.TCP, 7777, "");
-    
+    codexRecv.startReceiving(EProtocol.UDP, 7777, "");
   }
 }

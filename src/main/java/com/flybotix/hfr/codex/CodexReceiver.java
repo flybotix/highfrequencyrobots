@@ -28,16 +28,16 @@ import com.flybotix.hfr.util.lang.Delegator;
  * @param <E>
  * @param <V>
  */
-public class DefaultCodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<Codex<V, E>> implements IMessageParser<Codex<V, E>> {
+public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<Codex<V, E>> implements IMessageParser<Codex<V, E>> {
 
   protected final AEncoder<V, E> mEncoder;
   protected IReceiveProtocol mReceiveProtocol = null;
   
-  public DefaultCodexReceiver(AEncoder<V, E> pEncoder) {
+  public CodexReceiver(AEncoder<V, E> pEncoder) {
     mEncoder = pEncoder;
   }
   
-  public DefaultCodexReceiver(Class<E> pEnum) {
+  public CodexReceiver(Class<E> pEnum) {
     this(Codex.encoder.of(pEnum, true));
   }
   
