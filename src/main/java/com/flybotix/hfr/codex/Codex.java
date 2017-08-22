@@ -13,7 +13,8 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   private final AEncoder<V, E> mEncoder;
   private V[] mData;
   
-  public static final CodexFactory of = CodexFactory.inst();
+  public static final CodexMagic of = CodexMagic.inst();
+  public static final CodexMagic encoder = CodexMagic.inst();
   
   public Codex(AEncoder<V, E> pEncoder) {
     this(pEncoder, CodexMetadata.empty(pEncoder.getEnum()));

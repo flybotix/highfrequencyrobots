@@ -1,15 +1,7 @@
 package com.flybotix.hfr;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.flybotix.hfr.codex.CodexFactory;
 import com.flybotix.hfr.codex.DefaultCodexReceiver;
-import com.flybotix.hfr.codex.encode.AEncoder;
-import com.flybotix.hfr.io.Protocols;
 import com.flybotix.hfr.io.Protocols.EProtocol;
-import com.flybotix.hfr.io.receiver.IMessageParser;
-import com.flybotix.hfr.io.receiver.IReceiveProtocol;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -19,14 +11,11 @@ public class TestClientReceiver {
   private static ILog LOG = Logger.createLog(TestClientReceiver.class);
   
   public static void main(String[] pArgs) {
-    Logger.setLevel(ELevel.INFO);
-    AEncoder<Double, ETestData> enc = CodexFactory.getDoubleEncoder(ETestData.class, true);
-    DefaultCodexReceiver<Double, ETestData> codexRecv = new DefaultCodexReceiver<>(enc);
-    codexRecv.addListener(codex -> System.out.println(codex));
+    Logger.setLevel(ELevel.DEBUG);
     
-    Map<Integer, IMessageParser<?>> parsers = new HashMap<>();
-    parsers.put(ETestData.class.hashCode(), codexRecv);
-//    IReceiveProtocol irp = Protocols.createReceiver(EProtocol.UDP, 7777, "", parsers);
-    IReceiveProtocol irp = Protocols.createReceiver(EProtocol.TCP, 7777, "", parsers);
+    DefaultCodexReceiver<Double, ETestData> codexRecv = new DefaultCodexReceiver<>(ETestData.class);
+    codexRecv.addListener(codex -> System.out.println(codex));
+    codexRecv.startReceiving(EProtocol.TCP, 7777, "");
+    
   }
 }

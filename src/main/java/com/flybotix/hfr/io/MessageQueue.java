@@ -10,6 +10,10 @@ public final class MessageQueue {
   private final LinkedList<ByteBuffer> Q = new LinkedList<>();
   private final Semaphore sync = new Semaphore(1, true);
   
+  public boolean hasMessages() {
+    return !Q.isEmpty();
+  }
+  
   public void add(ByteBuffer bb) throws InterruptedException {
     sync.acquire();
     Q.addLast(bb);

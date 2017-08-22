@@ -36,6 +36,7 @@ public class TCPReceiver extends ASocketReceiver {
       try {
         while (mStatus.isConnected() && !mClientSocket.isClosed()) {
           try {
+            mLog.debug("Reading Socket...");
             read(dis);
             update(mStatus.periodicUpdate(mClientSocket.isConnected()));
           } catch (Exception e) {
@@ -85,6 +86,7 @@ public class TCPReceiver extends ASocketReceiver {
         mLog.debug("Attempting to find Input Stream");
         DataInputStream dis = new DataInputStream(mClientSocket.getInputStream());
         mLog.debug("Input Stream Found");
+        update(mStatus.connectionEstablished());
         startReadThread(dis);
       } catch (IOException e) {
         mSocketLock.release();
@@ -95,7 +97,6 @@ public class TCPReceiver extends ASocketReceiver {
         mLog.exception(e);
       }
       mLog.debug("Server Established");
-      update(mStatus.connectionEstablished());
     });
   }
 
@@ -112,8 +113,12 @@ public class TCPReceiver extends ASocketReceiver {
     int msgId = is.readInt();
     int msgSize = is.readInt();
 
-    mLog.debug("int=", msgId, " hex=", Integer.toHexString(msgId), " length=", msgSize);
+    mLog.debug("Received Message: id=", msgId, " length=", msgSize);
     byte[] buffer = mMessageBuffers.get(msgId);
+    if(buffer == null || buffer.length < msgSize) {
+      buffer = new byte[msgSize];
+      mMessageBuffers.put(msgId, buffer);
+    }
     readInput(is, msgSize, buffer);
     mLog.debug(Arrays.toString(buffer));
     addMessageToQ(msgId, ByteBuffer.wrap(Arrays.copyOf(buffer, msgSize)));

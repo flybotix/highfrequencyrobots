@@ -1,10 +1,14 @@
 package com.flybotix.hfr.codex;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.flybotix.hfr.codex.encode.AEncoder;
-import com.flybotix.hfr.codex.encode.CompressedEncoder;
+import com.flybotix.hfr.io.Protocols;
+import com.flybotix.hfr.io.Protocols.EProtocol;
 import com.flybotix.hfr.io.receiver.IMessageParser;
+import com.flybotix.hfr.io.receiver.IReceiveProtocol;
 import com.flybotix.hfr.util.lang.Delegator;
 
 /**
@@ -27,9 +31,14 @@ import com.flybotix.hfr.util.lang.Delegator;
 public class DefaultCodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<Codex<V, E>> implements IMessageParser<Codex<V, E>> {
 
   protected final AEncoder<V, E> mEncoder;
+  protected IReceiveProtocol mReceiveProtocol = null;
   
   public DefaultCodexReceiver(AEncoder<V, E> pEncoder) {
     mEncoder = pEncoder;
+  }
+  
+  public DefaultCodexReceiver(Class<E> pEnum) {
+    this(Codex.encoder.of(pEnum, true));
   }
   
   @Override
@@ -42,5 +51,12 @@ public class DefaultCodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Del
   @Override
   public int getBufferSize() {
     return mEncoder.getBufferSizeInBytes(); 
+  }
+  
+  public IReceiveProtocol startReceiving(EProtocol pType, int pHostPort, String pConnectionInfo) {
+    Map<Integer, IMessageParser<?>> parser = new HashMap<>();
+    parser.put(mEncoder.getMsgId(), this);
+    mReceiveProtocol = Protocols.createReceiver(pType, pHostPort, pConnectionInfo, parser);
+    return mReceiveProtocol;
   }
 }

@@ -12,6 +12,10 @@ public class ConnectionStatus {
   private Instant mLatestConnectionHeartbeat = null;
   private Instant mLatestDisconnect = null;
   
+  public String toString() {
+    return mState.name();
+  }
+  
   public EConnectionState getState() {
     return mState;
   }

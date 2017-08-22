@@ -5,24 +5,25 @@ import java.util.EnumSet;
 
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.CodexOf;
+import com.flybotix.hfr.util.lang.EnumUtils;
 import com.flybotix.hfr.codex.Codex;
 
 public abstract class AEncoder <V, E extends Enum<E> & CodexOf<V>>{
 
   private final Class<E> mEnumClass;
-  protected final EnumSet<E> mEnums;
   protected final int mLength;
   protected final int mBitSetByteLength;
+  protected final int mEnumHash;
   
   public AEncoder(Class<E> pEnum) {
     mEnumClass = pEnum;
-    mEnums = EnumSet.allOf(pEnum);
-    mLength = mEnums.size();
+    mLength = EnumSet.allOf(pEnum).size();
+    mEnumHash = EnumUtils.hashOf(pEnum);
     mBitSetByteLength = (mLength + Byte.SIZE-1) / Byte.SIZE;
   }
-
-  public EnumSet<E> getEnums() {
-    return mEnums;
+  
+  public int getMsgId() {
+    return mEnumHash;
   }
   
   public Class<E> getEnum() {

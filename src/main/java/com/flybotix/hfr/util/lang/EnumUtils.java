@@ -31,4 +31,14 @@ public class EnumUtils {
     Class<E> clazz = getEnumClass(pClass);
     return getSortedEnums(clazz);
   }
+  
+  public static <E extends Enum<E>> int hashOf(Class<E> pEnumeration) {
+    Set<E> set = EnumSet.allOf(pEnumeration);
+    int p = 31;
+    int result = 1;
+    for(E e : set) {
+      result = p * result + e.name().hashCode();
+    }
+    return result;
+  }
 }

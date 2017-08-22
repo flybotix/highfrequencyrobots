@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
 import com.flybotix.hfr.util.lang.Delegator;
-import com.flybotix.hfr.util.lang.IUpdate;
 
 class LoggingControls extends Delegator<LogOutput>{
   static final LoggingControls INST = new LoggingControls();

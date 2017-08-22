@@ -59,31 +59,34 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
       while(true) {
         for(Integer msgId : mMessageQ.keySet()) {
           MessageQueue q = mMessageQ.get(msgId);
-          IMessageParser<?> parser = mMessageParsers.get(msgId);
-          if(parser != null) {
+          if(q.hasMessages()) {
+            
             try {
               // Quickly pull the messages off the queue and re-release the lock
               List<ByteBuffer> cache = q.removeAll();
+              IMessageParser<?> parser = mMessageParsers.get(msgId);
               
-              // Now parse the messages in this thread, independently from how
-              // often the messages come in
-              for(ByteBuffer bb : cache) {
-                try {
-                  mLog.debug("Parsing ", Arrays.toString(bb.array()));
-                  Object o = parser.read(bb);
-                  if(o != null && pType != null && pType.equals(o.getClass())) {
-                    update(pType.cast(o));
+              if(parser == null) {
+                mLog.error("Unable to find a parser for message type " + msgId + ".  Message(s) lost.");
+              } else {
+                // Now parse the messages in this thread, independently from how
+                // often the messages come in
+                for(ByteBuffer bb : cache) {
+                  try {
+                    mLog.debug("Parsing ", Arrays.toString(bb.array()));
+                    Object o = parser.read(bb);
+                    if(o != null && pType != null && pType.equals(o.getClass())) {
+                      update(pType.cast(o));
+                    }
+                  } catch (Exception t) {
+                    mLog.error("When parsing a message of type " + msgId);
+                    mLog.exception(t);
                   }
-                } catch (Exception t) {
-                  mLog.error("When parsing a message of type " + msgId);
-                  mLog.exception(t);
                 }
               }
             } catch (Exception e) {
               mLog.exception(e);
             }
-          } else {
-            mLog.error("Unable to find a parser for message " + msgId + "\t0x" + Integer.toBinaryString(msgId));
           }
         }
         
