@@ -3,9 +3,9 @@ package com.flybotix.hfr.codex.encode;
 import java.nio.ByteBuffer;
 
 import com.flybotix.hfr.codex.Codex;
-import com.flybotix.hfr.codex.Type;
+import com.flybotix.hfr.codex.ICodexType;
 
-public class UncompressedEncoder <V, E extends Enum<E> & Type<V>> extends DefaultEncoder<V, E> {
+public class UncompressedEncoder <V, E extends Enum<E> & ICodexType<V>> extends DefaultEncoder<V, E> {
 
   public UncompressedEncoder(Class<E> pEnum, IEncoderProperties<V> pProps) {
     super(pEnum, pProps);

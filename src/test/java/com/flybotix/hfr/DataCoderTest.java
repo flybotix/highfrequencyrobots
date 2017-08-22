@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.flybotix.hfr.codex.Codex;
-import com.flybotix.hfr.codex.Type;
+import com.flybotix.hfr.codex.ICodexType;
 import com.flybotix.hfr.codex.encode.AEncoder;
 import com.flybotix.hfr.codex.encode.EncoderFactory;
 
@@ -30,7 +30,7 @@ public class DataCoderTest {
     }
   }
   
-  private enum TEST implements Type<Double>{
+  private enum TEST implements ICodexType<Double>{
     A,B,C,D,E,
     F,G,H,I,J,
     K,L,M,N,O,

@@ -1,7 +1,13 @@
 package com.flybotix.hfr.codex;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
+
 import com.flybotix.hfr.ETestData;
 import com.flybotix.hfr.codex.encode.AEncoder;
+import com.flybotix.hfr.codex.encode.CompressedEncoder;
 import com.flybotix.hfr.codex.encode.EncoderFactory;
 
 public final class CodexFactory {
@@ -11,13 +17,25 @@ public final class CodexFactory {
    * @param pEnum
    * @return
    */
-  public <E extends Enum<E> & Type<Double>> Codex<Double, E> doubles(Class<E> pEnum) {
+  public <E extends Enum<E> & ICodexType<Double>> Codex<Double, E> doubles(Class<E> pEnum) {
     AEncoder<Double, E> ae = EncoderFactory.getDoubleEncoder(pEnum, true); 
     return new Codex<Double, E>(ae);
   }
   
-  public static <E extends Enum<E>> void test(Class<E> pEnum) {
+  public static <V, E extends Enum<E> & ICodexType<V>> Class<V> getTypeOfCodex(Class<E> pEnum) {
+    Class<ICodexType<V>> forcecast = (Class<ICodexType<V>>)pEnum;
+    Type[] iface = forcecast.getGenericInterfaces();
+    Class<V> resultType = null;
+    for(Type t : iface) {
+      if(t.toString().contains(ICodexType.class.getSimpleName())) {
+        resultType = (Class<V>) ((ParameterizedType)t).getActualTypeArguments()[0];
+        break;
+      }
+    }
+    
+    return resultType;
   }
+  
   
   static CodexFactory inst() {
     return INST;
@@ -28,12 +46,7 @@ public final class CodexFactory {
     
   }
   
-  private static enum ENONTEST {
-    A,B,C
-  }
-  
   public static void main(String[] pArgs) {
-    CodexFactory.test(ETestData.class);
-    CodexFactory.test(ENONTEST.class);
+    System.out.println(CodexFactory.getTypeOfCodex(ETestData.class));
   }
 }

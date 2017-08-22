@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import com.flybotix.hfr.codex.CodexHash;
-import com.flybotix.hfr.codex.Type;
+import com.flybotix.hfr.codex.ICodexType;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
-public class CompressedEncoder <V, E extends Enum<E> & Type<V>> extends DefaultEncoder<V, E> {
+public class CompressedEncoder <V, E extends Enum<E> & ICodexType<V>> extends DefaultEncoder<V, E> {
   private static final ILog mLog = Logger.createLog(CompressedEncoder.class);
 
   public CompressedEncoder(Class<E> pEnum, IEncoderProperties<V> pProps) {

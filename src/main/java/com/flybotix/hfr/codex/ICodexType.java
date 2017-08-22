@@ -1,3 +1,3 @@
 package com.flybotix.hfr.codex;
 
-public interface Type<T> {}
+public interface ICodexType<T> {}

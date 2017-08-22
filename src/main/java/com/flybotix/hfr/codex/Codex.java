@@ -7,7 +7,7 @@ import com.flybotix.hfr.codex.encode.AEncoder;
 /**
  * It's like an enum map, but with less safety and better performance.
  */
-public class Codex <V, E extends Enum<E> & Type<V>>{
+public class Codex <V, E extends Enum<E> & ICodexType<V>>{
   
   private CodexMetadata<E> mMeta;
   private final AEncoder<V, E> mEncoder;
