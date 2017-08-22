@@ -1,6 +1,7 @@
 package com.flybotix.hfr.codex;
 
 import java.nio.ByteBuffer;
+import java.time.Instant;
 
 public class CodexMetadata <E extends Enum<E>> {
 
@@ -11,6 +12,11 @@ public class CodexMetadata <E extends Enum<E>> {
   public CodexMetadata(Class<E> pType, int pId, long pTimestamp) {
     mCodexTypeId = pType.hashCode();
     mId = pId;
+  }
+  
+  public void next() {
+    mId++;
+    mTimestamp = System.nanoTime();
   }
   
   public int id() {

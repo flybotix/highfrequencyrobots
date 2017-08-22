@@ -44,6 +44,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   
   public void reset() {
     Arrays.fill(mData, mEncoder.getDefaultValue());
+    mMeta.next();
   }
   
   public String toString() {
