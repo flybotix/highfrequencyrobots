@@ -147,6 +147,7 @@ class LoggingControls extends Delegator<LogOutput>{
 					// .append(":")
 					// .append(element.getLineNumber())
 					.append("::").append(element.getMethodName()).append("()")
+					.append(":").append(element.getLineNumber())
 					.toString();
 		}
 	}

@@ -14,18 +14,11 @@ import com.flybotix.hfr.codex.encode.BitEncoder;
 import com.flybotix.hfr.codex.encode.CompressedEncoder;
 import com.flybotix.hfr.codex.encode.IEncoderProperties;
 import com.flybotix.hfr.codex.encode.UncompressedEncoder;
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
 
 public final class CodexMagic {
-  
-//  /**
-//   * ONLY USE THIS FOR GLOBAL DATA
-//   * @param pEnum
-//   * @return
-//   */
-//  public <E extends Enum<E> & CodexOf<Double>> Codex<Double, E> doubles(Class<E> pEnum) {
-//    AEncoder<Double, E> ae = getDoubleEncoder(pEnum, true); 
-//    return new Codex<Double, E>(ae);
-//  }
+  private static final ILog mLog = Logger.createLog(CodexMagic.class);
   
   public <V, E extends Enum<E> & CodexOf<V>> Codex<V, E> thisEnum(Class<E> pEnum) {
     Class<V> valueClass = getTypeOfCodex(pEnum);
@@ -54,37 +47,6 @@ public final class CodexMagic {
   }
   
   @SuppressWarnings("unchecked")
-  private static <V, E extends Enum<E> & CodexOf<V>> Class<V> getTypeOfCodex(Class<E> pEnum) {
-    Class<CodexOf<V>> forcecast = (Class<CodexOf<V>>)pEnum;
-    Type[] iface = forcecast.getGenericInterfaces();
-    Class<V> resultType = null;
-    for(Type t : iface) {
-      if(t.toString().contains(CodexOf.class.getSimpleName())) {
-        resultType = (Class<V>) ((ParameterizedType)t).getActualTypeArguments()[0];
-        break;
-      }
-    }
-    
-    return resultType;
-  }
-  
-  public <E extends Enum<E> & CodexOf<Double>> AEncoder<Double, E> getDoubleEncoder(Class<E> pEnum, boolean pUseCompression) {
-    if(pUseCompression) {
-      return new CompressedEncoder<Double, E>(pEnum, DOUBLE_ENCODER_PROPERTIES);
-    } else {
-      return new UncompressedEncoder<Double, E>(pEnum, DOUBLE_ENCODER_PROPERTIES);
-    }
-  }
-  
-  public static <E extends Enum<E> & CodexOf<Long>> AEncoder<Long, E> getLongEncoder(Class<E> pEnum, boolean pUseCompression) {
-    if(pUseCompression) {
-      return new CompressedEncoder<Long, E>(pEnum, LONG_ENCODER_PROPERTIES);
-    } else {
-      return new UncompressedEncoder<>(pEnum, LONG_ENCODER_PROPERTIES);
-    }
-  }
-  
-  @SuppressWarnings("unchecked")
   public <T, E extends Enum<E> & CodexOf<T>> AEncoder<T, E> of(Class<E> pEnum, boolean pUseCompression) {
     AEncoder<T, E> result = null;
     if(!mDefaultEncoders.containsKey(pEnum)) {
@@ -104,24 +66,21 @@ public final class CodexMagic {
   }
   
   public <T, E extends Enum<E> & CodexOf<T>> void registerProperties(Class<E> pEnum, IEncoderProperties<T> pProperties) {
-    
+    mProperties.add(pProperties);
+    mDefaultEncoders.put(pEnum, new DefaultEncoders<>(pEnum, pProperties));
   }
   
 
-  
-  /**************************************************
-   * Properties
-   **************************************************/
   private <T, E extends Enum<E> & CodexOf<T>> IEncoderProperties<T> getPropertiesForEnum(Class<E> pEnum) {
     return findPropertiesForClass(getTypeOfCodex(pEnum));
   }
   
-  static class DefaultEncoders<V, E extends Enum<E> & CodexOf<V>> {
+  class DefaultEncoders<V, E extends Enum<E> & CodexOf<V>> {
     private final AEncoder<V, E> uncompressed;
     private final AEncoder<V, E> compressed;
     
     public DefaultEncoders(Class<E> pEnum) {
-      this(pEnum, INST.getPropertiesForEnum(pEnum));
+      this(pEnum, getPropertiesForEnum(pEnum));
     }
     
     public DefaultEncoders(Class<E> pEnum, IEncoderProperties<V> props) {
@@ -143,8 +102,40 @@ public final class CodexMagic {
   }
 
   private Set<IEncoderProperties<?>> mProperties = new HashSet<>();
-  private Map<Class<? extends Enum<?>>, DefaultEncoders<?,?>> mDefaultEncoders = new HashMap<>();
   
+  @SuppressWarnings("unchecked")
+  private static <V, E extends Enum<E> & CodexOf<V>> Class<V> getTypeOfCodex(Class<E> pEnum) {
+    Class<CodexOf<V>> forcecast = (Class<CodexOf<V>>)pEnum;
+    Type[] iface = forcecast.getGenericInterfaces();
+    Class<V> resultType = null;
+    for(Type t : iface) {
+      if(t.toString().contains(CodexOf.class.getSimpleName())) {
+        resultType = (Class<V>) ((ParameterizedType)t).getActualTypeArguments()[0];
+        break;
+      }
+    }
+    
+    return resultType;
+  }
+  
+  static CodexMagic inst() {
+    return Holder.instance;
+  }
+  
+  private CodexMagic() {
+    mProperties.add(DOUBLE_ENCODER_PROPERTIES);
+    mProperties.add(LONG_ENCODER_PROPERTIES);
+  }
+  private static class Holder {
+    private static CodexMagic instance = new CodexMagic();
+  }
+  
+  private Map<Class<? extends Enum<?>>, DefaultEncoders<?,?>> mDefaultEncoders = new HashMap<>();
+
+  
+  /**************************************************
+   * Properties
+   **************************************************/
   private static final IEncoderProperties<Long> LONG_ENCODER_PROPERTIES = new IEncoderProperties<Long>() {
     public Class<Long> getCodexType() {
       return Long.class;
@@ -208,14 +199,4 @@ public final class CodexMagic {
       pData.putDouble(pValue);
     }
   };
-  
-  static CodexMagic inst() {
-    return INST;
-  }
-  private static final CodexMagic INST = new CodexMagic();
-  
-  private CodexMagic() {
-    mProperties.add(DOUBLE_ENCODER_PROPERTIES);
-    mProperties.add(LONG_ENCODER_PROPERTIES);
-  }
 }

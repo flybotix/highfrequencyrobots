@@ -41,7 +41,7 @@ public class UDPSender extends ADataSender{
           msg = mMessageQ.removeFirst();
           if(msg != null) {
             byte[] arr = msg.array();
-            mLog.debug("Sending bytes ", Arrays.toString(arr));
+            mLog.debug("Sending " + arr.length + " raw bytes ", Arrays.toString(arr));
             DatagramPacket packet = new DatagramPacket(arr, arr.length, addr, mDestPort);
             socket.send(packet);
           }

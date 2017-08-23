@@ -21,13 +21,10 @@ public class TCPReceiver extends ASocketReceiver {
   protected Semaphore mSocketLock = new Semaphore(1, true);
 
   private ILog mLog = Logger.createLog(TCPReceiver.class);
-
-  private Map<Integer, byte[]> mMessageBuffers = new HashMap<>();
   
   @Override
   public void addParserForMessageType(Integer pType, IMessageParser<?> pParser) {
-    mMessageParsers.put(pType, pParser);
-    mLog.debug("Registering msg " + pType + " with buffer size " + pParser.getBufferSize());
+    super.addParserForMessageType(pType, pParser);
     mMessageBuffers.put(pType, new byte[pParser.getBufferSize()]);
   }
 

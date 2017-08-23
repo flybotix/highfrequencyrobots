@@ -12,9 +12,8 @@ import com.flybotix.hfr.util.log.Logger;
 
 public class UDPReceiver extends ASocketReceiver {
 
-  private int mMaxBufferSize = 0;
   private DatagramSocket mSocket = null;
-  private ILog mLog = Logger.createLog(UDPReceiver.class);
+  private static final ILog mLog = Logger.createLog(UDPReceiver.class);
 
   @Override
   public void establishConnection() {
@@ -38,6 +37,8 @@ public class UDPReceiver extends ASocketReceiver {
 
       while (mStatus.isConnected() && mSocket != null) {
         try {
+          // remember to reset the length of the packet to its maximum size every time
+          incoming.setLength(mMaxBufferSize);
           mSocket.receive(incoming);
           byte[] msgIdBuffer = new byte[Integer.BYTES];
           System.arraycopy(incoming.getData(), 0, msgIdBuffer, 0, Integer.BYTES);
@@ -46,16 +47,15 @@ public class UDPReceiver extends ASocketReceiver {
           byte[] msgSizeBuffer = new byte[Integer.BYTES];
           System.arraycopy(incoming.getData(), Integer.BYTES, msgSizeBuffer, 0, Integer.BYTES);
           int msgSize = ByteBuffer.wrap(msgSizeBuffer).getInt();
+          mLog.debug("Received msg id " + msgId + " with msg size " + msgSize + " (total packet size: " + incoming.getData().length + ")");
 
           byte[] receivedData = new byte[msgSize];
           System.arraycopy(incoming.getData(), 2*Integer.BYTES, receivedData, 0, msgSize);
 
-          // remember to reset the length of the packet to its maximum size every time
-          incoming.setLength(mMaxBufferSize);
 
           ByteBuffer msg = ByteBuffer.wrap(receivedData);
           // Then wrap the remaining region in a separate buffer as the message.
-          mLog.debug("Received message ", msgId, " with size ", msgSize, ": ", Arrays.toString(receivedData));
+          mLog.debug("Received message ", msgId, " with  size ", msgSize, ": ", Arrays.toString(receivedData));
           addMessageToQ(msgId, msg);
         } catch (IOException e) {
           mLog.exception(e);
@@ -67,12 +67,4 @@ public class UDPReceiver extends ASocketReceiver {
       }
     });
   }
-
-  @Override
-  public void addParserForMessageType(Integer pType, IMessageParser<?> pParser) {
-    mMaxBufferSize = Math.max(mMaxBufferSize, pParser.getBufferSize() + 2*Integer.BYTES);
-    mLog.info("Registering msg " + pType + " with buffer size " + pParser.getBufferSize());
-    mMessageParsers.put(pType, pParser);
-  }
-
 }

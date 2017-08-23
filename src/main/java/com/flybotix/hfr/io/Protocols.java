@@ -11,6 +11,10 @@ import com.flybotix.hfr.io.sender.TCPSender;
 import com.flybotix.hfr.io.sender.UDPSender;
 
 public class Protocols {
+  
+  public static final int MAX_PACKET_SIZE_BYTES = 65535;
+  public static double MAX_PACKET_RATE_HZ = 50d;
+  
   public enum EProtocol {
     TCP,
     UDP,
@@ -43,9 +47,11 @@ public class Protocols {
     switch(pType) {
     case TCP: 
       result = new TCPSender();
+      result.setBatching(true);
       break;
     case UDP:
       result = new UDPSender();
+      result.setBatching(true);
       break;
     default:
     }

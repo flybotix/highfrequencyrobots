@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import com.flybotix.hfr.io.EStaticMessageIds;
 import com.flybotix.hfr.io.MessageQueue;
+import com.flybotix.hfr.io.Protocols;
 import com.flybotix.hfr.util.lang.Delegator;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -39,13 +41,18 @@ import com.flybotix.hfr.util.log.Logger;
  * be notified of the incoming message (which is of type <T>).
  */
 public abstract class ADataReceiver <T> extends Delegator<T> implements IReceiveProtocol {
-  private ILog mLog = Logger.createLog(ADataReceiver.class);
+  private static final ILog mLog = Logger.createLog(ADataReceiver.class);
   protected final Map<Integer, MessageQueue> mMessageQ = new HashMap<>();
   protected final Map<Integer, IMessageParser<?>> mMessageParsers = new HashMap<>();
   protected long mDecodeRateMs = 5;
   private boolean mIsRegisteredWithShutdown = false;
   protected int mHostPort;
   protected String mHostInfo;
+  
+  // These are implementation-specific variables, but we need to house them here to support
+  // automatic batching
+  protected int mMaxBufferSize = 0;
+  protected Map<Integer, byte[]> mMessageBuffers = new HashMap<>();
   
   private static final Executor sRECEIVER_THREADS = 
     Executors.newCachedThreadPool(r -> new Thread(r, "Message Queue Decoding Thread"));
@@ -97,6 +104,8 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
         }
       }
     });
+    
+    addParserForMessageType(EStaticMessageIds.BATCHED_MESSAGE.ordinal(), new BatchParser());
   }
   
   public void setReceiverDecodeRate(long pRateHz) {
@@ -105,6 +114,8 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
 
   @Override
   public void addParserForMessageType(Integer pType, IMessageParser<?> pParser) {
+    mMaxBufferSize = Math.max(mMaxBufferSize, pParser.getBufferSize() + 2*Integer.BYTES);
+    mLog.info("Registering msg " + pType + " with buffer size " + pParser.getBufferSize() + " (max = " + mMaxBufferSize + ")");
     mMessageParsers.put(pType, pParser);
   }
   
@@ -149,4 +160,37 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
   }
   
   protected abstract void establishConnection();
+  
+  private final class BatchParser implements IMessageParser<ByteBuffer[]> {
+    @Override
+    public ByteBuffer[] read(ByteBuffer pData) {
+      // Format:
+      // 1 int : # of messages in the batch
+      // 1-N messages: int (id), int (size), byte[] (body)
+      int numMessages = pData.getInt();
+      mLog.debug("Splitting " + numMessages + " batched messages");
+      //NOTE - this doesn't duplicate bytes in memory.  These are merely
+      // references to the array backing the original message, but with different
+      // offsets & lengths representative of each individual message
+      ByteBuffer[] result = new ByteBuffer[numMessages];
+      for(int i = 0; i < numMessages; i++) {
+        Integer msgId = pData.getInt();
+        int msgSize = pData.getInt();
+        mLog.debug("Found batched msgId " + msgId + " with body size " + msgSize);
+//        ByteBuffer msgBody = ByteBuffer.allocate(msgSize);
+        int offset = pData.position();
+        ByteBuffer msgBody = ByteBuffer.wrap(pData.array(), offset, msgSize);
+        pData.position(offset + msgSize);
+        result[i] = msgBody;
+        addMessageToQ(msgId, msgBody);
+      }
+      return result;
+    }
+
+    @Override
+    public int getBufferSize() {
+      return Protocols.MAX_PACKET_SIZE_BYTES; // Theoretical max TCP/UDP size packet.  Max for NT is unknown.
+    }
+    
+  }
 }
