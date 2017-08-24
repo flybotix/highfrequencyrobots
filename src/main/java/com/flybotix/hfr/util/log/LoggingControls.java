@@ -50,7 +50,11 @@ class LoggingControls extends Delegator<LogOutput>{
 	
 	void logException(Exception pException)
 	{
-		log(ELevel.ERROR, format(pException));
+	  try {
+	    log(ELevel.ERROR, format(pException));
+	  } catch (Throwable t) {
+	    t.printStackTrace();
+	  }
 	}
 
 	void printStackTrace(ELevel pLevel, String... pNotes) {

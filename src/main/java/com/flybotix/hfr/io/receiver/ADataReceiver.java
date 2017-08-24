@@ -44,7 +44,7 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
   private static final ILog mLog = Logger.createLog(ADataReceiver.class);
   protected final Map<Integer, MessageQueue> mMessageQ = new HashMap<>();
   protected final Map<Integer, IMessageParser<?>> mMessageParsers = new HashMap<>();
-  protected long mDecodeRateMs = 5;
+  protected long mDecodeRateMs = 1;
   private boolean mIsRegisteredWithShutdown = false;
   protected int mHostPort;
   protected String mHostInfo;
@@ -108,8 +108,8 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
     addParserForMessageType(EStaticMessageIds.BATCHED_MESSAGE.ordinal(), new BatchParser());
   }
   
-  public void setReceiverDecodeRate(long pRateHz) {
-    mDecodeRateMs = (long)(1000l / pRateHz);
+  public void setReceiverDecodeRate(double pRateHz) {
+//    mDecodeRateMs = (long)(1000d / pRateHz);
   }
 
   @Override

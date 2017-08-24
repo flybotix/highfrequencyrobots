@@ -145,6 +145,9 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
         // 1- int = Number of batched messages
         // remaining = batched messages
         List<ByteBuffer> buffersToSend = batch.removeAllMessageUpToSize(Protocols.MAX_PACKET_SIZE_BYTES - (3 * Integer.BYTES));
+        if(MessageQueue.getTotalMessageSize(buffersToSend) >= Protocols.MAX_PACKET_SIZE_BYTES * 0.95) {
+          mLog.warn("Batch packet buffer is close to full.  If this is common consider adjusting Protocols.MAX_PACKET_RATE_HZ.");
+        }
         if(!buffersToSend.isEmpty()) {
           int msgSize = MessageQueue.getTotalMessageSize(buffersToSend);
           ByteBuffer msg = ByteBuffer.allocate(msgSize + 3 * Integer.BYTES);

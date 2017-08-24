@@ -6,6 +6,10 @@ import com.flybotix.hfr.codex.encode.AEncoder;
 
 /**
  * It's like an enum map, but with less safety and better performance.
+ * 
+ * Note - Codex and its methods are NOT thread safe.  DO NOT (e.g.) call
+ * reset() and encode() on the same codex instance from multiple threads.
+ * You will eventually get weird buffer errors, and your code may explode.
  */
 public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   
@@ -28,6 +32,10 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   
   public CodexMetadata<E> meta() {
     return mMeta;
+  }
+  
+  public int size() {
+    return mEncoder.getBufferSizeInBytes();
   }
   
   public byte[] encode() {

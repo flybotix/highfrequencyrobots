@@ -30,22 +30,39 @@ public class TestRobotSender implements TestConfig{
   }
   
   private static void testHighFrequency(CodexSender<Double, ETestData> sender, double pRateHz) {
-    LOG.warn("Sending data at " + pRateHz + "hz");
-    final Codex<Double, ETestData> data = Codex.of.thisEnum(ETestData.class);
-    final long periodMs = (long)(1000d/pRateHz);
-    Timer t = new Timer();
-    TimerTask tt = new TimerTask() {
-      private double mCount = 0;
-      public void run() {
-        data.reset();
-        mCount++;
-        for(ETestData e : ETestData.values()) {
-          data.put(e, e.ordinal() * mCount * Math.PI);
+    double totalRate = 0d;
+    for(int i = 0; i < TEST_HIGH_FREQUENCY_DATA_NUM_SEND_THREADS; i++) {
+      final Codex<Double, ETestData> data = Codex.of.thisEnum(ETestData.class);
+      double rand = Math.ceil((Math.random()-0.5d) * TEST_HIGH_FREQUENCY_DATA_RATE_RAND * pRateHz) + pRateHz;
+      totalRate += rand;
+      final long periodMs = (long)Math.ceil(1000d/rand);
+      LOG.warn("Thread " + i + " sending data at " + rand + "hz");
+      Timer t = new Timer("SEND THREAD " + i);
+      TimerTask tt = new TimerTask() {
+        private double mCount = 0;
+        public void run() {
+          data.reset();
+          mCount++;
+          for(ETestData e : ETestData.values()) {
+            data.put(e, e.ordinal() * mCount * Math.PI);
+          }
+          try {
+            sender.send(data);
+          } catch (Throwable t) {
+            t.printStackTrace();
+            try {
+              Thread.sleep(50);
+            } catch (InterruptedException e1) {
+              // TODO Auto-generated catch block
+              e1.printStackTrace();
+            }
+            System.exit(-1);
+          }
         }
-        sender.send(data);
-      }
-    };
-    t.scheduleAtFixedRate(tt, 0, periodMs);;
+      };
+      t.scheduleAtFixedRate(tt, 0, periodMs);
+    }
+    LOG.warn("Total (theoretical) message throughput (msgs/sec): " + totalRate);
   }
   
   private static void testSingle(CodexSender<Double, ETestData> sender) {

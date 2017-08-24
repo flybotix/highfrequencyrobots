@@ -2,6 +2,7 @@ package com.flybotix.hfr.io;
 
 import java.util.Map;
 
+import com.flybotix.hfr.io.receiver.ADataReceiver;
 import com.flybotix.hfr.io.receiver.IMessageParser;
 import com.flybotix.hfr.io.receiver.IReceiveProtocol;
 import com.flybotix.hfr.io.receiver.TCPReceiver;
@@ -12,7 +13,7 @@ import com.flybotix.hfr.io.sender.UDPSender;
 
 public class Protocols {
   
-  public static final int MAX_PACKET_SIZE_BYTES = 65535;
+  public static final int MAX_PACKET_SIZE_BYTES = 65507; // UDP datagram specification
   public static double MAX_PACKET_RATE_HZ = 50d;
   
   public enum EProtocol {
@@ -22,6 +23,7 @@ public class Protocols {
     PASSHTHROUGH
   }
   
+  @SuppressWarnings("rawtypes")
   public static IReceiveProtocol createReceiver(EProtocol pType, int pHostPort, String pConnectionInfo, Map<Integer, IMessageParser<?>> pParsers) {
     IReceiveProtocol result = null;
     switch(pType) {
@@ -32,6 +34,9 @@ public class Protocols {
       result = new UDPReceiver();
       break;
     default:
+    }
+    if(result instanceof ADataReceiver) {
+      ((ADataReceiver)result).setReceiverDecodeRate(MAX_PACKET_RATE_HZ);
     }
     result.setHostPort(pHostPort);
     result.setHostInfo(pConnectionInfo);
