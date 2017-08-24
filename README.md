@@ -2,7 +2,7 @@
 
 ## What it does, and why
  - Provides helpers to get started in as few as 7 lines of code!
- - Is a Java-native alternative to Network Tables for FRC robots non on a live field - no more deal with missing runtime libraries just to receive data in the lab!
+ - Is a Java-native alternative to Network Tables for FRC robots non on a live field - no more dealing with missing runtime libraries just to receive data in the lab!
  - Seamlessly integrates with Network Tables for live FRC field environments (including NT's protections & reliability)
  - Deals with threading & socket comms internally, so robot code doesn't have to.
  - Is available for UDP, TCP, NetworkTables, and 'passthrough' protocols
@@ -31,7 +31,7 @@ sender.initConnection(EProtocol.UDP, 7778, 7777, "localhost");
 ```
 3. On the laptop/client side, create a 'receiver'.  Then register for updates with that receiver.
 ```java
-CodexReceiver<Double, ETestData> receiver = new CodexReceiver<>(RobotData.class);
+CodexReceiver<Double, RobotData> receiver = new CodexReceiver<>(RobotData.class);
 receiver.startReceiving(EProtocol.UDP, 7777, "");
 receiver.addListener(codex -> System.out.println(codex));
 ```
