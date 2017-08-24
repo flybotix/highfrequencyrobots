@@ -1,7 +1,7 @@
 # High Frequency Data framework, meant for WiFi-based robots
 
 ## What it does, and why
- - Provides helpers to get started in as few as 7 lines of code!
+ - Provides helpers that deal with the entire communications protocol in as few as 6 lines of code!
  - Is a Java-native alternative to Network Tables for FRC robots non on a live field - no more dealing with missing runtime libraries just to receive data in the lab!
  - Seamlessly integrates with Network Tables for live FRC field environments (including NT's protections & reliability)
  - Deals with threading & socket comms internally, so robot code doesn't have to.
@@ -46,7 +46,7 @@ data.put(RobotData.pdb2, -23.3d);
 data.put(RobotData.gyro, mxp.getGyroRelative());
 
 // Use the data throughout the robot cycle after it's gathered
-double degrees = 
+double degrees = data.get(RobotData.gyro);
 
 // Send the data back to the laptop at the end of each cycle
 sender.send(data);
