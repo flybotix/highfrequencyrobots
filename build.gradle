@@ -1,21 +1,86 @@
 plugins {
-    id "java"
-    id "eclipse"
-    id "idea"
+  id "java"
+  id "eclipse"
+  id "idea"
 }
 
-  apply plugin: 'eclipse'
-  apply plugin: 'java'
-  
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
+apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+  mavenCentral() // tilesFX & Medusa (gauges)
+  jcenter() // fontawesomeFX
+}
+
+dependencies {
+  compile group: 'com.google.code.gson', name: 'gson', version: '2.8.0'
+
+}
+
+task javadocJar(type: Jar) {
+  classifier = 'javadoc'
+  from javadoc
+}
+
+task sourcesJar(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+signing {
+  sign configurations.archives
+}
+
+artifacts {
+  archives javadocJar, sourcesJar
+}
+
+uploadArchives {
   repositories {
-    mavenCentral() // tilesFX & Medusa (gauges)
-    jcenter() // fontawesomeFX
-  }
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-  dependencies {
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.0'
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
 
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'highfrequencyrobots'
+        packaging 'jar'
+        // optionally artifactId can be defined here 
+        description 'A way for wifi robots and IoT devices to quickly send compressed data arrays across a network.'
+        url 'http://www.flybotix.com'
+
+        scm {
+          connection 'https://github.com/flybotix/highfrequencyrobots.git'
+          developerConnection 'https://github.com/flybotix/highfrequencyrobots.git'
+          url 'https://github.com/flybotix/highfrequencyrobots.git'
+        }
+
+        licenses {
+          license {
+            name 'GNU Public License, Version 3.0'
+            url 'http://fsf.org/'
+          }
+        }
+
+        developers {
+          developer {
+            id hfrdeveloper
+            name hfrname
+            email hfremail
+          }
+        }
+      }
+    }
   }
+}

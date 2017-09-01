@@ -16,7 +16,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
 /**
- * This class extends a delegator for type <STATUS>, whatever an implementing class wants the status
+ * This class extends a delegator for type T, whatever an implementing class wants the status
  * to be.  The delegator class is a simple listener/update class.
  * 
  * This class implements IDataReceiver, which extends Runnable.  IDataReceiver promises a client methods for
@@ -31,14 +31,14 @@ import com.flybotix.hfr.util.log.Logger;
  * run() method (from Runnable), and then call addMessageToQ() once for each message.  This allows an implementing
  * class to deal with batching or not deal with batching on its own.
  * 
- * @param <T> - For the default TCP & UDP sockets, T is type ConnectionStatus. Any client which cares about 
+ * @param <T> - For the default TCP and UDP sockets, T is type ConnectionStatus. Any client which cares about 
  * connection status can add itself as a listener.  
  * 
  * However,
  * in cases where 'connection status' doesn't matter for an individual receiver (such as NetworkTables, 
  * or some UDP setups) then T can turn into the actual message received. The implementing class decides.
- * If Class<T> equals the decoded object's class, then any listener who was added to this class will
- * be notified of the incoming message (which is of type <T>).
+ * If Class T equals the decoded object's class, then any listener who was added to this class will
+ * be notified of the incoming message (which is of type T).
  */
 public abstract class ADataReceiver <T> extends Delegator<T> implements IReceiveProtocol {
   private static final ILog mLog = Logger.createLog(ADataReceiver.class);

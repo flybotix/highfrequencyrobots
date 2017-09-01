@@ -60,7 +60,7 @@ public class DataCoderTest {
     Codex<Double, TEST> res = new Codex<>(pCoder);
     for(TEST t : TEST.values()) {
       if(Math.random() <= pProbOfData) { 
-        res.put(t, Math.random() * 1024d);
+        res.set(t, Math.random() * 1024d);
       }
     }
     return res;

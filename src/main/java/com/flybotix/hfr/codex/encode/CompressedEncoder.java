@@ -45,7 +45,7 @@ public class CompressedEncoder <V, E extends Enum<E> & CodexOf<V>> extends Defau
     int dataidx = 0;
     for(int e = 0; e < mLength; e++) {
       if(hash.get(e)) {
-        result.put(e, decoded[dataidx]);
+        result.set(e, decoded[dataidx]);
         dataidx++;
       }
     }

@@ -14,12 +14,8 @@ import com.flybotix.hfr.codex.encode.BitEncoder;
 import com.flybotix.hfr.codex.encode.CompressedEncoder;
 import com.flybotix.hfr.codex.encode.IEncoderProperties;
 import com.flybotix.hfr.codex.encode.UncompressedEncoder;
-import com.flybotix.hfr.util.log.ILog;
-import com.flybotix.hfr.util.log.Logger;
 
 public final class CodexMagic {
-  private static final ILog mLog = Logger.createLog(CodexMagic.class);
-  
   public <V, E extends Enum<E> & CodexOf<V>> Codex<V, E> thisEnum(Class<E> pEnum) {
     Class<V> valueClass = getTypeOfCodex(pEnum);
     IEncoderProperties<V> props = findPropertiesForClass(valueClass);
@@ -46,12 +42,12 @@ public final class CodexMagic {
     mDefaultEncoders.put(pEnum, def);
   }
   
-  @SuppressWarnings("unchecked")
   public <T, E extends Enum<E> & CodexOf<T>> AEncoder<T, E> of(Class<E> pEnum, boolean pUseCompression) {
     AEncoder<T, E> result = null;
     if(!mDefaultEncoders.containsKey(pEnum)) {
       registerEnum(pEnum);
     }
+    @SuppressWarnings("unchecked")
     DefaultEncoders<T, E> encs = (DefaultEncoders<T, E>) mDefaultEncoders.get(pEnum);
     if(pUseCompression) {
       result = encs.compressed;
@@ -105,7 +101,8 @@ public final class CodexMagic {
   
   @SuppressWarnings("unchecked")
   private static <V, E extends Enum<E> & CodexOf<V>> Class<V> getTypeOfCodex(Class<E> pEnum) {
-    Class<CodexOf<V>> forcecast = (Class<CodexOf<V>>)pEnum;
+//    Class<CodexOf<V>> forcecast = (Class<CodexOf<V>>)pEnum;
+    Class<CodexOf<V>> forcecast = Class.class.cast(pEnum);
     Type[] iface = forcecast.getGenericInterfaces();
     Class<V> resultType = null;
     for(Type t : iface) {
@@ -125,6 +122,7 @@ public final class CodexMagic {
   private CodexMagic() {
     mProperties.add(DOUBLE_ENCODER_PROPERTIES);
     mProperties.add(LONG_ENCODER_PROPERTIES);
+    mProperties.add(INTEGER_ENCODER_PROPERTIES);
   }
   private static class Holder {
     private static CodexMagic instance = new CodexMagic();
@@ -136,6 +134,38 @@ public final class CodexMagic {
   /**************************************************
    * Properties
    **************************************************/
+  private static final IEncoderProperties<Integer> INTEGER_ENCODER_PROPERTIES = new IEncoderProperties<Integer>() {
+    public Class<Integer> getCodexType() {
+      return Integer.class;
+    }
+    
+    public Integer getDefaultValue(boolean pIsCompressedAlgorithm) {
+      if(pIsCompressedAlgorithm)return null;
+      else return Integer.MIN_VALUE;
+    }
+
+    public Integer[] generateEmptyArray(int pSize, boolean pIsCompressedAlgorithm) {
+      Integer[] result = new Integer[pSize];
+      Arrays.fill(result, getDefaultValue(pIsCompressedAlgorithm));
+      return result;
+    }
+
+    @Override
+    public int sizeOfSingle() {
+      return Integer.BYTES;
+    }
+
+    @Override
+    public Integer decodeSingle(ByteBuffer pData) {
+      return pData.getInt();
+    }
+
+    @Override
+    public void encodeSingle(ByteBuffer pData, Integer pValue) {
+      pData.putInt(pValue);
+    }
+  };
+  
   private static final IEncoderProperties<Long> LONG_ENCODER_PROPERTIES = new IEncoderProperties<Long>() {
     public Class<Long> getCodexType() {
       return Long.class;

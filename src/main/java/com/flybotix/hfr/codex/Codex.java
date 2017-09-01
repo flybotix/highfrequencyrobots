@@ -74,11 +74,11 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     return get(pData.ordinal());
   }
   
-  public void put(E pData, V pValue) {
-    put(pData.ordinal(), pValue);
+  public void set(E pData, V pValue) {
+    set(pData.ordinal(), pValue);
   }
   
-  public void put(int pOrdinal, V pValue) {
+  public void set(int pOrdinal, V pValue) {
     mData[pOrdinal] = pValue;
   }
   

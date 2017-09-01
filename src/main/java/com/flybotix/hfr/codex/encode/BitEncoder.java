@@ -39,7 +39,7 @@ public class BitEncoder <E extends Enum<E> & CodexOf<Boolean>> extends AEncoder<
     hash.set(mLength);
     Codex<Boolean, E> result = new Codex<>(this);
     for(int i = 0; i < mLength; i++) {
-      result.put(i, hash.get(i));
+      result.set(i, hash.get(i));
     }
     return result;
   }

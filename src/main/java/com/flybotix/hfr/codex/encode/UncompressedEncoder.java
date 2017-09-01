@@ -20,7 +20,7 @@ public class UncompressedEncoder <V, E extends Enum<E> & CodexOf<V>> extends Def
   protected Codex<V, E> decodeImpl(ByteBuffer pData) {
     Codex<V, E> result = new Codex<>(this);
     for(int dataidx = 0; dataidx < mLength; dataidx++) {
-      result.put(dataidx, mProps.decodeSingle(pData));
+      result.set(dataidx, mProps.decodeSingle(pData));
     }
     return result;
   }

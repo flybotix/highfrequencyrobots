@@ -44,7 +44,7 @@ public class TestRobotSender implements TestConfig{
           data.reset();
           mCount++;
           for(ETestData e : ETestData.values()) {
-            data.put(e, e.ordinal() * mCount * Math.PI);
+            data.set(e, e.ordinal() * mCount * Math.PI);
           }
           try {
             sender.send(data);
@@ -69,14 +69,14 @@ public class TestRobotSender implements TestConfig{
     
     Codex<Double, ETestData> data = Codex.of.thisEnum(ETestData.class);
     for(ETestData e : ETestData.values()) {
-      data.put(e, e.ordinal() * 10d * Math.PI);
+      data.set(e, e.ordinal() * 10d * Math.PI);
     }
     System.out.println("Sending " + data);
     
     sender.send(data);
     
     data.reset();
-    data.put(ETestData.pdb2, -23.3d);
+    data.set(ETestData.pdb2, -23.3d);
     sender.send(data);
     
   }
