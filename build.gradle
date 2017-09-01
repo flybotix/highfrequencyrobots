@@ -37,7 +37,7 @@ signing {
 }
 
 artifacts {
-  archives javadocJar, sourcesJar
+  archives jar, javadocJar, sourcesJar
 }
 
 uploadArchives {
@@ -49,9 +49,9 @@ uploadArchives {
         authentication(userName: ossrhUsername, password: ossrhPassword)
       }
 
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
+      //snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        //authentication(userName: ossrhUsername, password: ossrhPassword)
+      //}
 
       pom.project {
         name 'highfrequencyrobots'
@@ -61,15 +61,16 @@ uploadArchives {
         url 'http://www.flybotix.com'
 
         scm {
-          connection 'https://github.com/flybotix/highfrequencyrobots.git'
-          developerConnection 'https://github.com/flybotix/highfrequencyrobots.git'
-          url 'https://github.com/flybotix/highfrequencyrobots.git'
+          connection 'scm:git@github.com:flybotix/highfrequencyrobots.git'
+          developerConnection 'scm:git@github.com:flybotix/highfrequencyrobots.git'
+          url 'scm:git@github.com:flybotix/highfrequencyrobots.git'
         }
 
         licenses {
           license {
             name 'GNU Public License, Version 3.0'
             url 'http://fsf.org/'
+            distribution 'repo'
           }
         }
 
