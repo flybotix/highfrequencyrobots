@@ -72,3 +72,12 @@ The Codex in this project is an array that uses an enumeration to define what th
 An enumerated array was chosen over a EnumMap because indexing an array is a faster O(1) operation, whereas indexing into a map is a O(n) operation.  Since an enumeration's length never changes after compile-time, we know that the length of the data array will never change - and thus most operations into getting data from the array are safe.
 
 The fact that a Codex must represent data of the same type is simultaneously this project's biggest advantage and disadvantage.  It means this project will never represent complex types (e.g. like what JSON can do), but it also means that communicating the data can be extremely efficient (unlike JSON) - and therefore be executed at a higher frequency.  In FRC robots (and many IoT scenarios), the data is all of the same type.  If the data isn't sent over a comms protocol, then the type of the codex _can_ be a String, array of arrays, complex POJOs, etc, without worry of data corruption.
+
+## Future Work
+1. Multiple receivers for the same robot
+2. Implement NT protocol once I have access to a live robot
+3. Bandwidth monitoring on the client side
+4. Heuristics & warnings about limting quantities of fields, compression vs non-compression, etc.
+5. Export data to CSV with just 1 extra line of setup code
+6. Export data to iCanHasData auto-structuring in-memory DB
+7. Manage workload of the default client to keep resource usage low during export
