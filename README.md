@@ -2,7 +2,7 @@
 
 ## What it does, and why
  - Provides helpers that deal with the entire communications protocol in as few as 6 lines of code!
- - Is a Java-native alternative to Network Tables for FRC robots non on a live field - no more dealing with missing runtime libraries just to receive data in the lab!
+ - Is a Java-native alternative to Network Tables for FRC robots not on a live field - no more dealing with missing runtime libraries just to receive data in the lab!
  - Seamlessly integrates with Network Tables for live FRC field environments (including NT's protections & reliability)
  - Deals with threading & socket comms internally, so robot code doesn't have to.
  - Is available for UDP, TCP, NetworkTables, and 'passthrough' protocols
@@ -59,11 +59,16 @@ double degrees = data.get(RobotData.gyro);
 sender.send(data);
 ```
 
-## The Codex: an enumerated array.
+## The Codex: an enumerated array
+(WIP)
+This project is based upon two simple principles:
+1. A piece of data in an array actually has two pieces of information: the data value, and the position of the data in the array.
+2. We'd rather see compiler errors instead of weird data when the robot is running.  Compiler errors are easy to debug and fix.  Weird data is not.
 
+Enumerations in Java are just that: a compile-time reference of objects in a static array.  To get the position of the enumeration in the array, we call enum.ordinal().  To get the static information of the enumeration, we can call name(), toString(), or any other implemented method.  Enumerations can even implement interfaces, making them (effectively) static lambdas.  The HFR project expects a Codex's enumeration to be available at compile time on all "sides" of a comms link.
 
+The Codex in this project is an array that uses an enumeration to define what the values at any given position MEAN to a programmer & user. A programmer simply needs to specify the type in the array, and then the enumeration which backs the codex.  The class has a few utility and metadata methods.
 
+An enumerated array was chosen over a EnumMap because indexing an array is a faster O(1) operation, whereas indexing into a map is a O(n) operation.  Since an enumeration's length never changes after compile-time, we know that the length of the data array will never change - and thus most operations into getting data from the array are safe.
 
-
-
-
+The fact that a Codex must represent data of the same type is simultaneously this project's biggest advantage and disadvantage.  It means this project will never represent complex types (e.g. like what JSON can do), but it also means that communicating the data can be extremely efficient (unlike JSON) - and therefore be executed at a higher frequency.  In FRC robots (and many IoT scenarios), the data is all of the same type.  If the data isn't sent over a comms protocol, then the type of the codex _can_ be a String, array of arrays, complex POJOs, etc, without worry of data corruption.
