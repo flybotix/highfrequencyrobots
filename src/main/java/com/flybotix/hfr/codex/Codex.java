@@ -65,23 +65,77 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     Codex<V, E> o = (Codex<V, E>)pOther;
     return Arrays.equals(o.mData, mData);
   }
+
   
+  /**
+   * @return the value in the array at the ordinal
+   */
   public V get(int pOrdinal) {
     return mData[pOrdinal];
   }
   
+  /**
+   * @return the value in the array at the location of the enum's ordinal
+   */
   public V get(E pData) {
     return get(pData.ordinal());
   }
   
+  /**
+   * Set some data.
+   */
   public void set(E pData, V pValue) {
     set(pData.ordinal(), pValue);
   }
-  
+
+  /**
+   * Set some data.
+   */
   public void set(int pOrdinal, V pValue) {
     mData[pOrdinal] = pValue;
   }
+
+  /**
+   * This seemingly-useless method helps reduce boilerplate.  It also adds a way to hack booleans/flags into a codex of non-booleans.
+   * @param pOrdinal Value to check
+   * @return whether the value at the enum's location is not null and does not equal the codex's default value.
+   */
+  public boolean isSet(int pOrdinal) {
+	return !isNull(pOrdinal);
+  }
+
+
+  /**
+   * This seemingly-useless method helps reduce boilerplate.  It also adds a way to hack booleans/flags into a codex of non-booleans.
+   * @param pOrdinal Value to check
+   * @return whether the value at the enum's location is null or equals the codex's default value.
+   */
+  public boolean isNull(int pOrdinal) {
+	return mData[pOrdinal] == null || mData[pOrdinal].equals(mEncoder.getDefaultValue());
+  }
+
+  /**
+   * This seemingly-useless method helps reduce boilerplate.  It also adds a way to hack booleans/flags into a codex of non-booleans.
+   * @param pEnum Value to check
+   * @return whether the value at the enum's location is not null and does not equal the codex's default value.
+   */
+  public boolean isSet(E pEnum) {
+	return isSet(pEnum.ordinal());
+  }
+
+
+  /**
+   * This seemingly-useless method helps reduce boilerplate.  It also adds a way to hack booleans/flags into a codex of non-booleans.
+   * @param pEnum Value to check
+   * @return whether the value at the enum's location is null or equals the codex's default value.
+   */
+  public boolean isNull(E pEnum) {
+	  return isNull(pEnum.ordinal());
+  }
   
+  /**
+   * @return a hash based upon set values.
+   */
   public CodexHash hash() {
     CodexHash codex = new CodexHash();
     for(int i = 0; i < mData.length; i++) {
