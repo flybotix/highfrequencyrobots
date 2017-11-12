@@ -15,7 +15,7 @@ Get the artifact!
 ```
 groupId: com.flybotix
 artifactId: HighFrequencyRobots
-version: 0.0.7
+version: 0.0.12
 ```
 
 1. Create an enumeration that describes your data while implementing the CodexOf interface.  Both sides of the comms link will need this enumeration at compile time.  Since enumerations are lists of static objects, you can also do anything else you want with your enumeration (descriptions, short descriptions, inheritance, etc).
