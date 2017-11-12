@@ -37,6 +37,18 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
     mEncoder = pEncoder;
   }
   
+  public CodexReceiver(AEncoder<V, E> pEncoder, IReceiveProtocol pReceiver) {
+    this(pEncoder);
+    mReceiveProtocol = pReceiver;
+    mReceiveProtocol.addParserForMessageType(mEncoder.getMsgId(), this);
+  }
+  
+  public CodexReceiver(Class<E> pEnum, IReceiveProtocol pReceiver) {
+    this(Codex.encoder.of(pEnum, true));
+    mReceiveProtocol = pReceiver;
+    mReceiveProtocol.addParserForMessageType(mEncoder.getMsgId(), this);
+  }
+  
   public CodexReceiver(Class<E> pEnum) {
     this(Codex.encoder.of(pEnum, true));
   }

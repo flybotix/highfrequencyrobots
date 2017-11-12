@@ -3,8 +3,10 @@ package com.flybotix.hfr.io.receiver;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -64,7 +66,11 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
     // parser/listeners
     sRECEIVER_THREADS.execute(()->{
       while(true) {
-        for(Integer msgId : mMessageQ.keySet()) {
+        Set<Integer> keys;
+        synchronized(mMessageQ) {
+          keys = new HashSet<>(mMessageQ.keySet());
+        }
+        for(Integer msgId : keys) {
           MessageQueue q = mMessageQ.get(msgId);
           if(q.hasMessages()) {
             
@@ -124,7 +130,9 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
       MessageQueue queue = mMessageQ.get(pType);
       if(queue == null) {
         queue = new MessageQueue();
-        mMessageQ.put(pType, queue);
+        synchronized(mMessageQ) {
+          mMessageQ.put(pType, queue);
+        }
       }
       
       queue.add(pMsg);

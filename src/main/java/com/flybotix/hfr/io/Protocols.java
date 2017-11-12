@@ -24,7 +24,7 @@ public class Protocols {
   }
   
   @SuppressWarnings("rawtypes")
-  public static IReceiveProtocol createReceiver(EProtocol pType, int pHostPort, String pConnectionInfo, Map<Integer, IMessageParser<?>> pParsers) {
+  public static IReceiveProtocol createReceiver(EProtocol pType, int pHostPort, String pConnectionInfo) {
     IReceiveProtocol result = null;
     switch(pType) {
     case TCP:
@@ -40,10 +40,16 @@ public class Protocols {
     }
     result.setHostPort(pHostPort);
     result.setHostInfo(pConnectionInfo);
+    result.connect();
+    return result;
+  }
+  
+  @SuppressWarnings("rawtypes")
+  public static IReceiveProtocol createReceiver(EProtocol pType, int pHostPort, String pConnectionInfo, Map<Integer, IMessageParser<?>> pParsers) {
+    IReceiveProtocol result = createReceiver(pType, pHostPort, pConnectionInfo);
     for(Integer id : pParsers.keySet()) {
       result.addParserForMessageType(id, pParsers.get(id));
     }
-    result.connect();
     return result;
   }
   
