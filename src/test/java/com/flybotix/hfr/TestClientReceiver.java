@@ -15,6 +15,7 @@ public class TestClientReceiver implements TestConfig{
   private static ILog LOG = Logger.createLog(TestClientReceiver.class);
   
   public static void main(String[] pArgs) {
+    Logger.setLevel(ELevel.DEBUG);
     Protocols.MAX_PACKET_RATE_HZ = MAX_PACKET_RATE_HZ;
     CodexReceiver<Double, ETestData> codexRecv = new CodexReceiver<>(ETestData.class);
     if(TEST_HIGH_FREQUENCY_DATA_OVER_SOCKET) {

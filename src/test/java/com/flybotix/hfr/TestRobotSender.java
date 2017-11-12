@@ -15,11 +15,12 @@ public class TestRobotSender implements TestConfig{
   private static ILog LOG = Logger.createLog(TestRobotSender.class);
 
   public static void main(String[] pArgs) throws Exception{
+    Logger.setLevel(ELevel.DEBUG);
     Protocols.MAX_PACKET_RATE_HZ = MAX_PACKET_RATE_HZ;
     
-    CodexSender<Double, ETestData> sender = new CodexSender<>(ETestData.class, true);
+    CodexSender sender = new CodexSender();
     sender.initConnection(TEST_SOCKET_PROTOCOL, TEST_SENDER_PORT, TEST_RECEIVER_PORT, TEST_RECEIVER_HOST_NAME);
-    
+    LOG.info("Sending data to " + TEST_RECEIVER_HOST_NAME + ":" + TEST_RECEIVER_PORT);
     if(TEST_HIGH_FREQUENCY_DATA_OVER_SOCKET) {
       Logger.setLevel(ELevel.WARN);
       testHighFrequency(sender, TEST_HIGH_FREQUENCY_DATA_RATE_HZ);
@@ -29,7 +30,7 @@ public class TestRobotSender implements TestConfig{
     }
   }
   
-  private static void testHighFrequency(CodexSender<Double, ETestData> sender, double pRateHz) {
+  private static void testHighFrequency(CodexSender sender, double pRateHz) {
     double totalRate = 0d;
     for(int i = 0; i < TEST_HIGH_FREQUENCY_DATA_NUM_SEND_THREADS; i++) {
       final Codex<Double, ETestData> data = Codex.of.thisEnum(ETestData.class);
@@ -65,19 +66,20 @@ public class TestRobotSender implements TestConfig{
     LOG.warn("Total (theoretical) message throughput (msgs/sec): " + totalRate);
   }
   
-  private static void testSingle(CodexSender<Double, ETestData> sender) {
+  private static void testSingle(CodexSender sender) {
     
     Codex<Double, ETestData> data = Codex.of.thisEnum(ETestData.class);
     for(ETestData e : ETestData.values()) {
-      data.set(e, e.ordinal() * 10d * Math.PI);
+      data.set(e, e.ordinal() * Math.PI);
     }
     System.out.println("Sending " + data);
     
     sender.send(data);
     
-    data.reset();
-    data.set(ETestData.pdb2, -23.3d);
-    sender.send(data);
+//    data.reset();
+//    data.set(ETestData.pdb2, -23.3d);
+//    System.out.println("Sending " + data);
+//    sender.send(data);
     
   }
 }

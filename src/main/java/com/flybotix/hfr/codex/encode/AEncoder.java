@@ -6,9 +6,12 @@ import java.util.EnumSet;
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.CodexOf;
 import com.flybotix.hfr.util.lang.EnumUtils;
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
 import com.flybotix.hfr.codex.Codex;
 
 public abstract class AEncoder <V, E extends Enum<E> & CodexOf<V>>{
+  private static final ILog mLog = Logger.createLog(AEncoder.class);
 
   private final Class<E> mEnumClass;
   protected final int mLength;
@@ -37,12 +40,14 @@ public abstract class AEncoder <V, E extends Enum<E> & CodexOf<V>>{
   public byte[] encode(Codex<V, E> pData) {
     byte[] body = encodeImpl(pData);
     byte[] header = pData.meta().encode();
+    mLog.debug("Header: " + pData.meta());
     
     return ByteBuffer.allocate(header.length + body.length).put(header).put(body).array();
   }
   
   public Codex<V,E> decode(ByteBuffer pData) {
     CodexMetadata<E> header = CodexMetadata.parse(mEnumClass, pData);
+    mLog.debug("Header: " + header);
     Codex<V, E> body = decodeImpl(pData);
     body.setMetadata(header);
     return body;

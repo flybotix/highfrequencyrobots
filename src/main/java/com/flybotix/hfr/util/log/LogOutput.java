@@ -17,6 +17,7 @@ public class LogOutput {
 	}
 	
 	public String toString() {
-	  return "[" + level + "] [" + thread + "] [" + method + ":\t" + text;
+//	  return "[" + level + "] [" + thread + "] [" + method + ":\t" + text;
+    return "[" + level + "] [" + method + ":\t" + text;
 	}
 }

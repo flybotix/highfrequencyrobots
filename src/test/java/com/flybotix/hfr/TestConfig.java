@@ -7,7 +7,7 @@ interface TestConfig {
   
   static final double     TEST_HIGH_FREQUENCY_DATA_RATE_HZ = 100d;
   static final double     TEST_HIGH_FREQUENCY_DATA_RATE_RAND = 0.05d;
-  static final boolean    TEST_HIGH_FREQUENCY_DATA_OVER_SOCKET = true;
+  static final boolean    TEST_HIGH_FREQUENCY_DATA_OVER_SOCKET = false;
   static final int        TEST_HIGH_FREQUENCY_DATA_NUM_SEND_THREADS = 1;
   
   static final EProtocol  TEST_SOCKET_PROTOCOL = EProtocol.UDP;

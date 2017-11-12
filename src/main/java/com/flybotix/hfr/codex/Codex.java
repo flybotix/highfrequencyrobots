@@ -38,6 +38,10 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     return mEncoder.getBufferSizeInBytes();
   }
   
+  public int msgId() {
+    return mEncoder.getMsgId();
+  }
+  
   public byte[] encode() {
     return mEncoder.encode(this);
   }
