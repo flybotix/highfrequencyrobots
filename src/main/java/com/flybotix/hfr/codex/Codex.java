@@ -10,6 +10,9 @@ import com.flybotix.hfr.codex.encode.AEncoder;
  * Note - Codex and its methods are NOT thread safe.  DO NOT (e.g.) call
  * reset() and encode() on the same codex instance from multiple threads.
  * You will eventually get weird buffer errors, and your code may explode.
+ * 
+ * @param <V> The type backing the codex
+ * @param <E> The enumeration backing the codex
  */
 public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   
@@ -72,7 +75,9 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
 
   
   /**
+   * Useful for looping functionss
    * @return the value in the array at the ordinal
+   * @param pOrdinal The index/ordinal to get
    */
   public V get(int pOrdinal) {
     return mData[pOrdinal];
@@ -80,6 +85,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   
   /**
    * @return the value in the array at the location of the enum's ordinal
+   * @param pData The data piece to get
    */
   public V get(E pData) {
     return get(pData.ordinal());
@@ -87,13 +93,17 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   
   /**
    * Set some data.
+   * @param pData The data to set
+   * @param pValue The value of the data
    */
   public void set(E pData, V pValue) {
     set(pData.ordinal(), pValue);
   }
 
   /**
-   * Set some data.
+   * Set some data via a cached (or looped) index/ordinal
+   * @param pOrdinal The index of the data (matches E.ordinal())
+   * @param pValue The value of the data
    */
   public void set(int pOrdinal, V pValue) {
     mData[pOrdinal] = pValue;
@@ -105,7 +115,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
    * @return whether the value at the enum's location is not null and does not equal the codex's default value.
    */
   public boolean isSet(int pOrdinal) {
-	return !isNull(pOrdinal);
+    return !isNull(pOrdinal);
   }
 
 
@@ -115,7 +125,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
    * @return whether the value at the enum's location is null or equals the codex's default value.
    */
   public boolean isNull(int pOrdinal) {
-	return mData[pOrdinal] == null || mData[pOrdinal].equals(mEncoder.getDefaultValue());
+    return mData[pOrdinal] == null || mData[pOrdinal].equals(mEncoder.getDefaultValue());
   }
 
   /**
@@ -124,7 +134,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
    * @return whether the value at the enum's location is not null and does not equal the codex's default value.
    */
   public boolean isSet(E pEnum) {
-	return isSet(pEnum.ordinal());
+    return isSet(pEnum.ordinal());
   }
 
 

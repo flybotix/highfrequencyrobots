@@ -12,6 +12,7 @@ public interface ISendProtocol extends IProvider<ConnectionStatus> {
   /**
    * NOTE - if this is called while a sender connection is live, then any
    * message currently being "batched" will be lost.
+   * @param pUseBatching If <code>TRUE</code> then the protocol will batch multiple messages in a single packet if necessary
    */
   public void setBatching(boolean pUseBatching);
   public void connect();

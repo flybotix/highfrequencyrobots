@@ -72,7 +72,7 @@ public class TestRobotSender implements TestConfig{
     for(ETestData e : ETestData.values()) {
       data.set(e, e.ordinal() * Math.PI);
     }
-    System.out.println("Sending " + data);
+    LOG.debug("Sending " + data);
     
     sender.send(data);
     

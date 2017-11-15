@@ -27,6 +27,10 @@ public class EnumUtils {
     return null;
   }
   
+  public static <E extends Enum<E>> E getFirstEnumInstance(Class<E> pEnum) {
+    return getSortedEnums(pEnum).get(0);
+  }
+  
   public static <E extends Enum<E>> List<E> classLoadEnums(String pClass) {
     Class<E> clazz = getEnumClass(pClass);
     return getSortedEnums(clazz);

@@ -4,6 +4,10 @@ import java.nio.ByteBuffer;
 
 import com.flybotix.hfr.util.lang.EnumUtils;
 
+/**
+ * Class which holds a bit of metadata about a codex instance.
+ * @param <E>
+ */
 public class CodexMetadata <E extends Enum<E>> {
 
   private int mId = 0;
@@ -15,6 +19,11 @@ public class CodexMetadata <E extends Enum<E>> {
     return mId + "\t" + mCodexTypeId + "\t" + mTimestamp + "\t" + mKey;
   }
   
+  /**
+   * @param pType Enum that backs the codex
+   * @param pId Initial instance id.  This will get incremented upon reset().
+   * @param pTimestamp Initial timestamp, in nanoseconds.
+   */
   public CodexMetadata(Class<E> pType, int pId, long pTimestamp) {
 	  this(pType, pId, pTimestamp, -1);
   }
@@ -30,39 +39,103 @@ public class CodexMetadata <E extends Enum<E>> {
     mId = pId;
   }
   
+  /**
+   * Incrememnts the instance ID, but does not set the current time.
+   */
   public void next() {
-    mId++;
-    mTimestamp = System.nanoTime();
+    next(false);
   }
   
+  /**
+   * Increments the instance ID and sets the nanotimestamp to current time 
+   * @param pUpdateTime whether or not to set the nanotime to current time
+   */
+  public void next(boolean pUpdateTime) {
+    mId++;
+    if(pUpdateTime) {
+      setTimeNanos(System.nanoTime());
+    }
+  }
+  
+  /**
+   * @return the current cycle ID of the Codex.  This also matches the
+   * number of times Codex.reset() has been called for this instance. 
+   */
   public int id() {
     return mId;
   }
   
+  /**
+   * This is set by calling EnumUtils.hashOf() with the enum class.  In theory this
+   * matches the potential message id, but that isn't the case for batched messages.
+   * @return a hash representation of the backing enum
+   */
   public int type() {
     return mCodexTypeId;
   }
   
-  public long time() {
+  /**
+   * Note - if the setTimeNanos() method is called, the caller
+   * has full control over whether it is a system-relative time
+   * or whether it is nanoseconds relative to some specific point in
+   * time (such as match start).  Consult that code for what to expect here.
+   * <br><br>If nothing overrides the timestamp, then this method will be
+   * the equivalent of the latest System.nanoTime() call.
+   * @return the timestamp in nanos.
+   */
+  public long timeNanos() {
     return mTimestamp;
   }
   
+  /**
+   * Manually set the current nano timestamp. the caller
+   * has full control over whether it is a system-relative time
+   * or whether it is nanoseconds relative to some specific point in
+   * time (such as match start).  So technically a coder could choose
+   * milliseconds here, although that defeats the purpose of one-codex-per-cycle.
+   * @param pTimestamp time in nanoseconds
+   */
+  public void setTimeNanos(long pTimestamp) {
+    mTimestamp = pTimestamp;
+  }
+  
+  /**
+   * When used with the id() method, this helps create a composite unique identifier
+   * to an exact cycle of a codex instance.
+   * @return a user-set key that represents an instance ID
+   */
   public Integer key() {
 	  return mKey;
   }
   
+  /**
+   * @return the transmitted size of the metadata
+   */
   public static int sizeOf() {
-    return Integer.BYTES + Long.BYTES; 
+    return Integer.BYTES + Long.BYTES + Integer.BYTES; 
   }
   
+  /**
+   * @return a byte array that can be decoded via CodexMetadata.parse()
+   */
   public byte[] encode() {
-    return ByteBuffer.allocate(sizeOf()).putInt(mId).putLong(mTimestamp).array();
+    return ByteBuffer.allocate(sizeOf()).putInt(mId).putLong(mTimestamp).putInt(mKey).array();
   }
   
+  /**
+   * @param pEnum The enum that backs the Codex.
+   * @param pData The byte[] array wrapped in a buffer.  Hopefully it was created with the encode() method.
+   * @return a Codex Meta data object, supposing nothing went wrong
+   */
   public static <E extends Enum<E>> CodexMetadata<E> parse(Class<E> pEnum, ByteBuffer pData) {
-    return new CodexMetadata<E>(pEnum, pData.getInt(), pData.getLong());
+    return new CodexMetadata<E>(pEnum, pData.getInt(), pData.getLong(), pData.getInt());
   }
 
+  /**
+   * Creates an empty metadata object based off the num.
+   * @param pEnum The enumeration that backs the Codex
+   * @return a Codex Metadata object that is initialzed with everything = 0
+   */
   public static <E extends Enum<E>> CodexMetadata<E> empty(Class<E> pEnum) {
     return new CodexMetadata<>(pEnum, 0, 0);
   }

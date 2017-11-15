@@ -14,8 +14,20 @@ import com.flybotix.hfr.codex.encode.BitEncoder;
 import com.flybotix.hfr.codex.encode.CompressedEncoder;
 import com.flybotix.hfr.codex.encode.IEncoderProperties;
 import com.flybotix.hfr.codex.encode.UncompressedEncoder;
+import com.flybotix.hfr.util.lang.MethodCaller;
 
 public final class CodexMagic {
+
+  private Set<IEncoderProperties<?>> mProperties = new HashSet<>();
+  private Map<Class<? extends Enum<?>>, DefaultEncoders<?,?>> mDefaultEncoders = new HashMap<>();
+  
+  /**
+   * Creates a codex based upon the passed-in enumeration
+   * @param pEnum An enumeration that implements the CodexOf interface
+   * @return A codex
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
   public <V, E extends Enum<E> & CodexOf<V>> Codex<V, E> thisEnum(Class<E> pEnum) {
     Class<V> valueClass = getTypeOfCodex(pEnum);
     IEncoderProperties<V> props = findPropertiesForClass(valueClass);
@@ -27,12 +39,26 @@ public final class CodexMagic {
     return new Codex<V, E>(enc);
   }
 
+  /**
+   * Uses the codex type of the enumeration to generate properties for the enumeration.  Advanced usage only.
+   * @param pEnum The codex enumeration to register.
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
   public <V, E extends Enum<E> & CodexOf<V>> void registerEnum(Class<E> pEnum) {
     Class<V> valueClass = getTypeOfCodex(pEnum);
     IEncoderProperties<V> props = findPropertiesForClass(valueClass);
     registerEnum(pEnum, props);
   }
 
+  /**
+   * Internally-caches the properties for usage with the codex enumeration.  Helps to ensure
+   * identical encoding behavior when using multiple instances of codexes for a single enumeration.
+   * @param pEnum The codex enumeration.
+   * @param pProperties Encoder Properties
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
   public <V, E extends Enum<E> & CodexOf<V>> void registerEnum(Class<E> pEnum, IEncoderProperties<V> pProperties) {
     if(pProperties == null) {
       throw new IllegalArgumentException("Cannot create encoders & codexes when the EncoderProperties<V> parameter is null.");
@@ -41,14 +67,32 @@ public final class CodexMagic {
     DefaultEncoders<V, E> def = new DefaultEncoders<>(pEnum, pProperties);
     mDefaultEncoders.put(pEnum, def);
   }
+
+  /**
+   * @param pEnum a Codex-based enumeration
+   * @return an encoder for the given Enum class
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
+  public <V, E extends Enum<E> & CodexOf<V>> AEncoder<V, E> of(Class<E> pEnum) {
+    Boolean useCompression = MethodCaller.getBooleanFromEnum(pEnum, "usesCompression", true);
+    return of(pEnum, useCompression);
+  }
   
-  public <T, E extends Enum<E> & CodexOf<T>> AEncoder<T, E> of(Class<E> pEnum, boolean pUseCompression) {
-    AEncoder<T, E> result = null;
+  /**
+   * @param pEnum A Codex-based enumeration
+   * @param pUseCompression Should the encoder use compression? If the data is sometimes sparse, set this to true.  Otherwise, false.
+   * @return an encoder for the given Enum class
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
+  public <V, E extends Enum<E> & CodexOf<V>> AEncoder<V, E> of(Class<E> pEnum, boolean pUseCompression) {
+    AEncoder<V, E> result = null;
     if(!mDefaultEncoders.containsKey(pEnum)) {
       registerEnum(pEnum);
     }
     @SuppressWarnings("unchecked")
-    DefaultEncoders<T, E> encs = (DefaultEncoders<T, E>) mDefaultEncoders.get(pEnum);
+    DefaultEncoders<V, E> encs = (DefaultEncoders<V, E>) mDefaultEncoders.get(pEnum);
     if(pUseCompression) {
       result = encs.compressed;
     } else {
@@ -57,20 +101,48 @@ public final class CodexMagic {
     return result;
   }
   
+  /**
+   * Creates an encoder for a Boolean-based Codex Enumeration.  Boolean encoders use the BitSet class rather
+   * than an array of Booleans, making the entire thing very efficient to store and transmit.
+   * @param pEnum An enumeration that implements CodexOf&#60;Boolean&#62;
+   * @return An encoder for Boolean codexes
+   * @param <E> The enumeration backing the codex
+   */
   public static <E extends Enum<E> & CodexOf<Boolean>> AEncoder<Boolean, E> getBooleanEncoder(Class<E> pEnum) {
     return new BitEncoder<E>(pEnum);
   }
   
-  public <T, E extends Enum<E> & CodexOf<T>> void registerProperties(Class<E> pEnum, IEncoderProperties<T> pProperties) {
+  /**
+   * Advaned Usage.  Sets custom proprties for a particular enumeration.  Custom proprties can override default
+   * values of a codex, alter the encode/decode algorithms, etc.  This also allows for Codexes to be used
+   * with complex objects rather than just primitives.
+   * @param pEnum A codex-based enumeration
+   * @param pProperties Properties to set for the codex
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
+  public <V, E extends Enum<E> & CodexOf<V>> void registerProperties(Class<E> pEnum, IEncoderProperties<V> pProperties) {
     mProperties.add(pProperties);
     mDefaultEncoders.put(pEnum, new DefaultEncoders<>(pEnum, pProperties));
   }
   
 
-  private <T, E extends Enum<E> & CodexOf<T>> IEncoderProperties<T> getPropertiesForEnum(Class<E> pEnum) {
+  /**
+   * @param pEnum A codex-based enumeration
+   * @return The registered properties based upon the Type of the enum
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
+  private <V, E extends Enum<E> & CodexOf<V>> IEncoderProperties<V> getPropertiesForEnum(Class<E> pEnum) {
     return findPropertiesForClass(getTypeOfCodex(pEnum));
   }
   
+  /**
+   * Holder method for compressed & uncompressed encoders of the primitive encoders
+   *
+   * @param <V> Primitive Type
+   * @param <E> Codex-based enumeration
+   */
   class DefaultEncoders<V, E extends Enum<E> & CodexOf<V>> {
     private final AEncoder<V, E> uncompressed;
     private final AEncoder<V, E> compressed;
@@ -85,6 +157,11 @@ public final class CodexMagic {
     }
   }
   
+  /*
+   * Lookup method for properties.  Returns null if they are not found.
+   * @param pClass
+   * @return
+   */
   @SuppressWarnings("unchecked")
   private <T> IEncoderProperties<T> findPropertiesForClass(Class<T> pClass) {
     IEncoderProperties<T> result = null;
@@ -96,8 +173,6 @@ public final class CodexMagic {
     }
     return result;
   }
-
-  private Set<IEncoderProperties<?>> mProperties = new HashSet<>();
   
   @SuppressWarnings("unchecked")
   private static <V, E extends Enum<E> & CodexOf<V>> Class<V> getTypeOfCodex(Class<E> pEnum) {
@@ -127,9 +202,6 @@ public final class CodexMagic {
   private static class Holder {
     private static CodexMagic instance = new CodexMagic();
   }
-  
-  private Map<Class<? extends Enum<?>>, DefaultEncoders<?,?>> mDefaultEncoders = new HashMap<>();
-
   
   /**************************************************
    * Properties

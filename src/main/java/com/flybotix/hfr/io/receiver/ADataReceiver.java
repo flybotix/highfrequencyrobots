@@ -65,10 +65,14 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
     // Start the polling thread which pulls messages off the queue and pushes them to the
     // parser/listeners
     sRECEIVER_THREADS.execute(()->{
+      Set<Integer> keys = new HashSet<>();
       while(true) {
-        Set<Integer> keys;
+        keys.clear();
         synchronized(mMessageQ) {
-          keys = new HashSet<>(mMessageQ.keySet());
+          // Concurrency trick - if a new MessageQ (i.e. msgid) is added as we iterate,
+          // then we'll pick it up on the next pass.  That way we keep the synchronzied
+          // block length to a minimum.
+          keys.addAll(mMessageQ.keySet());
         }
         for(Integer msgId : keys) {
           MessageQueue q = mMessageQ.get(msgId);

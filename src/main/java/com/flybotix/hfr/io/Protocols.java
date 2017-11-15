@@ -23,6 +23,15 @@ public class Protocols {
     PASSHTHROUGH
   }
   
+  /**
+   * Creates and connects a receiver using the provided information.  If the protocol type is TCP, then
+   * this method will block until a client connects.  No matter the protocol, it is recommended to create
+   * a receiver in a separate thread.
+   * @param pType UDP, TCP, NetworkTables, or Passthrough (Only TCP and UDP work at the moment)
+   * @param pHostPort The port that will open up on the server in order to accept incoming meessages
+   * @param pConnectionInfo Protocol-specific info.  Most of the time this can be blank, but it's necessary for NT.
+   * @return an interface into the protocol
+   */
   @SuppressWarnings("rawtypes")
   public static IReceiveProtocol createReceiver(EProtocol pType, int pHostPort, String pConnectionInfo) {
     IReceiveProtocol result = null;
@@ -44,7 +53,17 @@ public class Protocols {
     return result;
   }
   
-  @SuppressWarnings("rawtypes")
+  /**
+   * Creates and connects a receiver using the provided information, then adds all of the input parsers to the receiver.
+   * If the protocol type is TCP, then
+   * this method will block until a client connects.  No matter the protocol, it is recommended to create
+   * a receiver in a separate thread.
+   * @param pType UDP, TCP, NetworkTables, or Passthrough (Only TCP and UDP work at the moment)
+   * @param pHostPort The port that will open up on the server in order to accept incoming meessages
+   * @param pConnectionInfo Protocol-specific info.  Most of the time this can be blank, but it's necessary for NT.
+   * @param pParsers Map of parsers to add to the receiver
+   * @return an interface into the protocol
+   */
   public static IReceiveProtocol createReceiver(EProtocol pType, int pHostPort, String pConnectionInfo, Map<Integer, IMessageParser<?>> pParsers) {
     IReceiveProtocol result = createReceiver(pType, pHostPort, pConnectionInfo);
     for(Integer id : pParsers.keySet()) {
@@ -53,6 +72,19 @@ public class Protocols {
     return result;
   }
   
+  /**
+   * Creates a send protocol based upon the Protocol type.  This thread does not block (even for TCP) since
+   * the receivers handle connections in their own thread pool.  There are no guarantees that messages
+   * sent prior to an actual connection (i.e. TCP) will be received by the other side.
+   * <br><br>
+   * Also note that for the time being, TCP and UDP protocols will use batching. 
+   * 
+   * @param pType UDP, TCP, NetworkTables, or Passthrough.  Currently, only TCP and UDP are supported.
+   * @param pHostPort The port that will be bound to in order to send data.
+   * @param pDestPort The destination port of the receiver.
+   * @param pDestAddr The destination address.  Accepts hostname or IP address.
+   * @return an interface to the protocol
+   */
   public static ISendProtocol createSender(EProtocol pType, int pHostPort, int pDestPort, String pDestAddr) {
     ISendProtocol result = null;
     switch(pType) {

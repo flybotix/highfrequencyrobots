@@ -15,7 +15,7 @@ import com.flybotix.hfr.util.log.Logger;
  * will block until all registered listeners have finished processing the message; the calls to the
  * registered listener will occur on that thread.
  *
- * @param <T>
+ * @param <T> The type of object that will be updated
  */
 
 public class Delegator<T> implements IProvider<T> {
