@@ -1,12 +1,12 @@
 # High Frequency Data framework, meant for WiFi-based robots
 
 ## What it does, and why
+ - HFR is a Java-native IoT comms protocol that also acts alternative to Network Tables for FRC robots not on a live field.
  - Provides helpers that deal with the entire communications protocol in as few as 6 lines of code!
- - HFR is a Java-native alternative to Network Tables for FRC robots not on a live field.
  - (WIP) Seamlessly integrates with Network Tables for live FRC field environments (including NT's protections & reliability)
- - Deals with threading & socket comms internally, so robot code doesn't have to.
+ - Deals with threading & socket comms internally, so robot code doesn't have to.  This includes batching of multiple tiny 'messages' in order to stay within the limitations of packet sizes and rates.
  - Is available for UDP, TCP, NetworkTables (WIP), and 'passthrough' (WIP) protocols
- - Automatically compresses null data.  This means we no longer need to fear bandwidth limitations when sending a 'null' element across a network.
+ - Automatically compresses NULL data.  This means we no longer need to fear bandwidth limitations when sending a NULL element across a network.
  - Includes auto-incrementing metadata that keeps track of cycles for Codexes, which allows normalization of the data structure the Codex represents.
  - Includes benchmark & data integrity tests to ensure encode/decode/transit processing times are minimized
 
