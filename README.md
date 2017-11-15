@@ -2,12 +2,12 @@
 
 ## What it does, and why
  - Provides helpers that deal with the entire communications protocol in as few as 6 lines of code!
- - Is a Java-native alternative to Network Tables for FRC robots not on a live field - no more dealing with missing runtime libraries just to receive data in the lab!
- - Seamlessly integrates with Network Tables for live FRC field environments (including NT's protections & reliability)
+ - HFR is a Java-native alternative to Network Tables for FRC robots not on a live field.
+ - (WIP) Seamlessly integrates with Network Tables for live FRC field environments (including NT's protections & reliability)
  - Deals with threading & socket comms internally, so robot code doesn't have to.
- - Is available for UDP, TCP, NetworkTables, and 'passthrough' protocols
- - Automatically compresses null data, in order to encourage the best practice of not reading sensors when they aren't needed
- - Auto-increments metadata of cycle id & relative nanosecond timestamp for Codexes
+ - Is available for UDP, TCP, NetworkTables (WIP), and 'passthrough' (WIP) protocols
+ - Automatically compresses null data.  This means we no longer need to fear bandwidth limitations when sending a 'null' element across a network.
+ - Includes auto-incrementing metadata that keeps track of cycles for Codexes, which allows normalization of the data structure the Codex represents.
  - Includes benchmark & data integrity tests to ensure encode/decode/transit processing times are minimized
 
 ## Getting started
@@ -15,7 +15,9 @@ Get the artifact!
 ```
 groupId: com.flybotix
 artifactId: HighFrequencyRobots
-version: 0.0.15
+version: <stable release coming soon!>
+
+Dev version: 0.0.16
 ```
 
 1. Create an enumeration that describes your data while implementing the CodexOf interface.  Both sides of the comms link will need this enumeration at compile time.  Since enumerations are lists of static objects, you can also do anything else you want with your enumeration (descriptions, short descriptions, inheritance, etc).
@@ -62,7 +64,7 @@ sender.send(data);
 ## The Codex: an enumerated array
 (WIP)
 This project is based upon two simple principles:
-1. A piece of data in an array actually has two pieces of information: the data value, and the position of the data in the array.
+1. A piece of data in an array actually has two pieces of information: the data value, and the position of the data in the array. If a piece of data does not exist at a particular position in an array, it is NULL - which also tells us something about that data.
 2. We'd rather see compiler errors instead of weird data when the robot is running.  Compiler errors are easy to debug and fix.  Weird data is not.
 
 Enumerations in Java are just that: a compile-time reference of objects in a static array.  To get the position of the enumeration in the array, we call enum.ordinal().  To get the static information of the enumeration, we can call name(), toString(), or any other implemented method.  Enumerations can even implement interfaces, making them (effectively) static lambdas.  The HFR project expects a Codex's enumeration to be available at compile time on all "sides" of a comms link.
@@ -74,10 +76,9 @@ An enumerated array was chosen over a EnumMap because indexing an array is a fas
 The fact that a Codex must represent data of the same type is simultaneously this project's biggest advantage and disadvantage.  It means this project will never represent complex types (e.g. like what JSON can do), but it also means that communicating the data can be extremely efficient (unlike JSON) - and therefore be executed at a higher frequency.  In FRC robots (and many IoT scenarios), the data is all of the same type.  If the data isn't sent over a comms protocol, then the type of the codex _can_ be a String, array of arrays, complex POJOs, etc, without worry of data corruption.
 
 ## Future Work
-1. Multiple receivers for the same robot
-2. Implement NT protocol once I have access to a live robot
+1. Re-usable protocol for multiple CodexReceivers
+2. Implement NT protocol 
 3. Bandwidth monitoring on the client side
 4. Heuristics & warnings about limting quantities of fields, compression vs non-compression, etc.
 5. Export data to CSV with just 1 extra line of setup code
-6. Export data to iCanHasData auto-structuring in-memory DB
-7. Manage workload of the default client to keep resource usage low during export
+6. Manage workload of the default client to keep resource usage low during export
