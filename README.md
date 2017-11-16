@@ -11,11 +11,11 @@
  - Includes benchmark & data integrity tests to ensure encode/decode/transit processing times are minimized
 
 ## Getting started
-Get the artifact!
+Get the artifact! Latest stable release:
 ```
 groupId: com.flybotix
 artifactId: HighFrequencyRobots
-version: <stable release coming soon!>
+version: 2015.11.15
 
 Dev version: 0.0.16
 ```
