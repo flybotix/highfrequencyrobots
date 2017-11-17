@@ -15,7 +15,7 @@ Get the artifact! Latest stable release:
 ```
 groupId: com.flybotix
 artifactId: HighFrequencyRobots
-version: 2015.11.15
+version: 2017.11.15
 
 Dev version: 0.0.16
 ```
@@ -75,10 +75,13 @@ An enumerated array was chosen over a EnumMap because indexing an array is a fas
 
 The fact that a Codex must represent data of the same type is simultaneously this project's biggest advantage and disadvantage.  It means this project will never represent complex types (e.g. like what JSON can do), but it also means that communicating the data can be extremely efficient (unlike JSON) - and therefore be executed at a higher frequency.  In FRC robots (and many IoT scenarios), the data is all of the same type.  If the data isn't sent over a comms protocol, then the type of the codex _can_ be a String, array of arrays, complex POJOs, etc, without worry of data corruption.
 
-## Future Work
+## Future Work (in order)
 1. Re-usable protocol for multiple CodexReceivers
-2. Implement NT protocol 
-3. Bandwidth monitoring on the client side
-4. Heuristics & warnings about limting quantities of fields, compression vs non-compression, etc.
-5. Export data to CSV with just 1 extra line of setup code
-6. Manage workload of the default client to keep resource usage low during export
+1. Implement & end-to-end test NT protocol with a live robot
+1. Create a class for linked instances of the same Codex (e.g. linking multiple TalonSRX Codexes together)
+1. Export data to CSV with just 1 extra line of setup code
+1. Bandwidth monitoring on the client side
+1. End-to-end test TCP protocol with a live robot
+1. Manage workload of the default client to keep resource usage low during export
+1. Heuristics & warnings about limting quantities of fields, compression vs non-compression, etc.
+1. Manage workload of the default client to keep resource usage low during export
