@@ -16,9 +16,9 @@ import com.flybotix.hfr.codex.encode.AEncoder;
  */
 public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   
-  private CodexMetadata<E> mMeta;
-  private final AEncoder<V, E> mEncoder;
-  private V[] mData;
+  protected CodexMetadata<E> mMeta;
+  protected final AEncoder<V, E> mEncoder;
+  protected V[] mData;
   
   public static final CodexMagic of = CodexMagic.inst();
   public static final CodexMagic encoder = CodexMagic.inst();

@@ -29,6 +29,31 @@ public final class CodexMagic {
    * @param <E> The enumeration backing the codex
    */
   public <V, E extends Enum<E> & CodexOf<V>> Codex<V, E> thisEnum(Class<E> pEnum) {
+    return thisEnum(pEnum, -1);
+  }
+  
+  /**
+   * Creates a codex based upon the passed-in enumeration
+   * @param pEnum An enumeration that implements the CodexOf interface
+   * @param pKey Set a specific composite key for this codex
+   * @return A codex
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
+  public <V, E extends Enum<E> & CodexOf<V>> Codex<V, E> thisEnum(Class<E> pEnum, int pKey) {
+    return thisEnum(pEnum, pKey, false);
+  }
+  
+  /**
+   * Creates a codex based upon the passed-in enumeration
+   * @param pEnum An enumeration that implements the CodexOf interface
+   * @param pKey Set a specific composite key for this codex
+   * @param pIsThreadsafe - if <code>true</code> this will return a synchronized version of the codex (WIP)
+   * @return A codex
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
+  public <V, E extends Enum<E> & CodexOf<V>> Codex<V, E> thisEnum(Class<E> pEnum, int pKey, boolean pIsThreadsafe) {
     Class<V> valueClass = getTypeOfCodex(pEnum);
     IEncoderProperties<V> props = findPropertiesForClass(valueClass);
     if(props == null) {
@@ -36,7 +61,9 @@ public final class CodexMagic {
         " If it is primitive, notify the developer.  If it is a custom type, make one yourself and register it.");
     }
     AEncoder<V, E> enc = new CompressedEncoder<>(pEnum, props);
-    return new Codex<V, E>(enc);
+    Codex<V, E> result = pIsThreadsafe ? new ThreadsafeCodex<>(enc) : new Codex<V, E>(enc);
+    result.meta().setCompositeKey(pKey);
+    return result;
   }
 
   /**

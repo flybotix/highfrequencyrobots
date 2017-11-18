@@ -17,7 +17,7 @@ groupId: com.flybotix
 artifactId: HighFrequencyRobots
 version: 2017.11.15
 
-Dev version: 0.0.16
+Dev version: 0.0.20
 ```
 
 1. Create an enumeration that describes your data while implementing the CodexOf interface.  Both sides of the comms link will need this enumeration at compile time.  Since enumerations are lists of static objects, you can also do anything else you want with your enumeration (descriptions, short descriptions, inheritance, etc).
@@ -78,7 +78,7 @@ The fact that a Codex must represent data of the same type is simultaneously thi
 
 ## Future Work (in order)
 1. Implement & end-to-end test NT protocol with a live robot
-1. Create a class for linked instances of the same Codex (e.g. linking multiple TalonSRX Codexes together)
+1. Test threadsafe codex class, end-to-end.  Also add a thread executor to CodexSender.
 1. Export data to CSV with just 1 extra line of setup code
 1. Bandwidth monitoring on the client side
 1. End-to-end test TCP protocol with a live robot

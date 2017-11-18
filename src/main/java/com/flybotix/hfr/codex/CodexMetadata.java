@@ -37,6 +37,7 @@ public class CodexMetadata <E extends Enum<E>> {
   public CodexMetadata(Class<E> pType, int pId, long pTimestamp, Integer pCompositeKey) {
     mCodexTypeId = EnumUtils.hashOf(pType);
     mId = pId;
+    mKey = pCompositeKey;
   }
   
   /**
@@ -120,6 +121,10 @@ public class CodexMetadata <E extends Enum<E>> {
    */
   public byte[] encode() {
     return ByteBuffer.allocate(sizeOf()).putInt(mId).putLong(mTimestamp).putInt(mKey).array();
+  }
+  
+  public void setCompositeKey(int pKey) {
+    mKey = pKey;
   }
   
   /**

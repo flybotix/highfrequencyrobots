@@ -24,7 +24,7 @@ public class UDPSender extends ADataSender{
   @Override
   protected void establishConnection(InetAddress addr) {
     try {
-      socket = new DatagramSocket(mHostPort, InetAddress.getLocalHost());
+      socket = new DatagramSocket(mHostPort, InetAddress.getByName("localhost"));
       mLog.debug("Established local socket at ", mHostPort);
       update(mStatus.connectionEstablished());
     } catch (SocketException e) {

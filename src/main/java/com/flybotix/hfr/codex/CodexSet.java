@@ -28,7 +28,7 @@ public class CodexSet <V, E extends Enum<E> & CodexOf<V>>{
   public boolean setByIndex(int pIndex, E pData, V pValue) {
     boolean result = false;
     if(pIndex >= 0 && pIndex < mCodexes.length) {
-      mCodexes[i].set(pData, pValue);
+      mCodexes[pIndex].set(pData, pValue);
     }
     return result;
   }
