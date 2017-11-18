@@ -33,14 +33,23 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     mEncoder = pEncoder;
   }
   
+  /**
+   * @return the metadata
+   */
   public CodexMetadata<E> meta() {
     return mMeta;
   }
   
+  /**
+   * @return the size (in bytes) of a message which represents this codex
+   */
   public int size() {
     return mEncoder.getBufferSizeInBytes();
   }
   
+  /**
+   * @return the message ID for a comms protocol
+   */
   public int msgId() {
     return mEncoder.getMsgId();
   }
@@ -53,6 +62,9 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     mMeta = pMeta;
   }
   
+  /**
+   * @return (effectcively) this is E.values().length
+   */
   public int length() {
     return mData.length;
   }

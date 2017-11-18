@@ -6,6 +6,7 @@ import com.flybotix.hfr.codex.CodexReceiver;
 import com.flybotix.hfr.codex.CodexSender;
 import com.flybotix.hfr.io.Protocols;
 import com.flybotix.hfr.io.Protocols.EProtocol;
+import com.flybotix.hfr.io.receiver.IReceiveProtocol;
 import com.flybotix.hfr.io.sender.ISendProtocol;
 
 public class DemoCode {
@@ -19,9 +20,8 @@ public class DemoCode {
   }
   
   public void createReceiver () {
-
-    CodexReceiver<Double, ETestData> receiver = new CodexReceiver<>(ETestData.class);
-    receiver.startReceiving(EProtocol.UDP, 7777, "");
+    IReceiveProtocol protocol = Protocols.createReceiver(EProtocol.UDP, 7778, "localhost");
+    CodexReceiver<Double, ETestData> receiver = new CodexReceiver<>(ETestData.class, protocol);
     receiver.addListener(codex -> System.out.println(codex));
   }
   

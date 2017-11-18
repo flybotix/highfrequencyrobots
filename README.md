@@ -35,13 +35,14 @@ public enum RobotData implements CodexOf<Double>{
 ```
 2. On your robot, create a "sender".
 ```java
-CodexSender<Double, RobotData> sender = new CodexSender<>(RobotData.class, true);
-sender.initConnection(EProtocol.UDP, 7778, 7777, "localhost");
+ISendProtocol protocol = Protocols.createSender(EProtocol.UDP, 7778, 7777, "localhost");
+CodexSender sender = new CodexSender(protocol);
 ```
 3. On the laptop/client side, create a 'receiver'.  Then register for updates with that receiver.
 ```java
-CodexReceiver<Double, RobotData> receiver = new CodexReceiver<>(RobotData.class);
-receiver.startReceiving(EProtocol.UDP, 7777, "");
+// Re-use this protocol for all of the receivers
+IReceiveProtocol protocol = Protocols.createReceiver(EProtocol.UDP, 7778, "localhost");
+CodexReceiver<Double, ETestData> receiver = new CodexReceiver<>(ETestData.class, protocol);
 receiver.addListener(codex -> System.out.println(codex));
 ```
 4.  During robot initialization, create a Codex and pass its reference where it's needed.  Try not to create a 'new' Codex for the same enumeration, as that may cause Java's garbage collection to pause the robot.
@@ -76,7 +77,6 @@ An enumerated array was chosen over a EnumMap because indexing an array is a fas
 The fact that a Codex must represent data of the same type is simultaneously this project's biggest advantage and disadvantage.  It means this project will never represent complex types (e.g. like what JSON can do), but it also means that communicating the data can be extremely efficient (unlike JSON) - and therefore be executed at a higher frequency.  In FRC robots (and many IoT scenarios), the data is all of the same type.  If the data isn't sent over a comms protocol, then the type of the codex _can_ be a String, array of arrays, complex POJOs, etc, without worry of data corruption.
 
 ## Future Work (in order)
-1. Re-usable protocol for multiple CodexReceivers
 1. Implement & end-to-end test NT protocol with a live robot
 1. Create a class for linked instances of the same Codex (e.g. linking multiple TalonSRX Codexes together)
 1. Export data to CSV with just 1 extra line of setup code
