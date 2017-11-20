@@ -13,6 +13,10 @@ public class BitEncoder <E extends Enum<E> & CodexOf<Boolean>> extends AEncoder<
     super(pEnum);
   }
   
+  public AEncoder<Boolean, E> createClone() {
+    return new BitEncoder<E>(super.getEnum());
+  }
+  
   @Override
   public int getBufferSizeInBytes() {
     return mBitSetByteLength;

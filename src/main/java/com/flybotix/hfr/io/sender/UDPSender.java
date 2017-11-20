@@ -5,7 +5,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
@@ -24,18 +23,16 @@ public class UDPSender extends ADataSender{
   @Override
   protected void establishConnection(InetAddress addr) {
     try {
-      socket = new DatagramSocket(mHostPort, InetAddress.getByName("localhost"));
+      socket = new DatagramSocket(mHostPort);
       mLog.debug("Established local socket at ", mHostPort);
       update(mStatus.connectionEstablished());
     } catch (SocketException e) {
-      e.printStackTrace();
-    } catch (UnknownHostException e) {
       e.printStackTrace();
     }
     startSendThread(addr);
   }
 
-  private void startSendThread(InetAddress addr) {
+  private void startSendThread(final InetAddress addr) {
     mThreads.execute(() -> {
       while(mStatus.isConnected()) {
         ByteBuffer msg = null;

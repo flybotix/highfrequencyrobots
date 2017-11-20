@@ -16,6 +16,10 @@ public class CompressedEncoder <V, E extends Enum<E> & CodexOf<V>> extends Defau
   public CompressedEncoder(Class<E> pEnum, IEncoderProperties<V> pProps) {
     super(pEnum, pProps);
   }
+  
+  public AEncoder<V,E> createClone() {
+    return new CompressedEncoder<V,E>(super.getEnum(), mProps);
+  }
 
   @Override
   protected boolean isCompressed() {

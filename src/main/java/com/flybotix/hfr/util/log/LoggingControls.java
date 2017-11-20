@@ -35,9 +35,13 @@ class LoggingControls extends Delegator<LogOutput>{
 			}
 		});
 	}
+	
+	boolean isLevelEnabled(ELevel pLevel) {
+	  return pLevel.ordinal() >= mLevel.ordinal();
+	}
 
 	void log(ELevel pLevel, String pText) {
-	  if(pLevel.ordinal() >= mLevel.ordinal()) {
+	  if(isLevelEnabled(pLevel)) {
   		LogOutput output = new LogOutput(
   				System.currentTimeMillis(), 
   				pLevel, 

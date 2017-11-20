@@ -31,17 +31,20 @@ public class Logger implements ILog {
 
 	@Override
 	public void debug(Object... pOutputs) {
-		LoggingControls.INST.log(ELevel.DEBUG, generateString(pOutputs));
+	  if(LoggingControls.INST.isLevelEnabled(ELevel.DEBUG))
+	    LoggingControls.INST.log(ELevel.DEBUG, generateString(pOutputs));
 	}
 
 	@Override
 	public void info(Object... pOutputs) {
+    if(LoggingControls.INST.isLevelEnabled(ELevel.INFO))
 		LoggingControls.INST.log(ELevel.INFO, generateString(pOutputs));
 
 	}
 
 	@Override
 	public void warn(Object... pOutputs) {
+    if(LoggingControls.INST.isLevelEnabled(ELevel.WARN))
 		LoggingControls.INST.log(ELevel.WARN, generateString(pOutputs));
 
 	}

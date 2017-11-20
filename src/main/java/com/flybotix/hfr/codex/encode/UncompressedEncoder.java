@@ -10,6 +10,10 @@ public class UncompressedEncoder <V, E extends Enum<E> & CodexOf<V>> extends Def
   public UncompressedEncoder(Class<E> pEnum, IEncoderProperties<V> pProps) {
     super(pEnum, pProps);
   }
+  
+  public AEncoder<V,E> createClone() {
+    return new UncompressedEncoder<V,E>(super.getEnum(), mProps);
+  }
 
   @Override
   protected boolean isCompressed() {

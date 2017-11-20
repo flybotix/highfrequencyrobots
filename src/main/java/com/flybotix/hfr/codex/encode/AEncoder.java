@@ -36,6 +36,7 @@ public abstract class AEncoder <V, E extends Enum<E> & CodexOf<V>>{
   public abstract int getBufferSizeInBytes();
   public abstract V getDefaultValue();
   public abstract V[] generateEmptyArray();
+  public abstract AEncoder<V,E> createClone();
   
   public byte[] encode(Codex<V, E> pData) {
     byte[] body = encodeImpl(pData);
