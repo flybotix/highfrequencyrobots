@@ -60,8 +60,9 @@ public final class CodexMagic {
       throw new IllegalArgumentException("Unable to find a properties implementation associated to " + valueClass + ". " +
         " If it is primitive, notify the developer.  If it is a custom type, make one yourself and register it.");
     }
-    AEncoder<V, E> enc = new CompressedEncoder<>(pEnum, props);
-    Codex<V, E> result = pIsThreadsafe ? new ThreadsafeCodex<>(enc) : new Codex<V, E>(enc);
+//    AEncoder<V, E> enc = new CompressedEncoder<>(pEnum, props);
+//    Codex<V, E> result = pIsThreadsafe ? new ThreadsafeCodex<>(enc) : new Codex<V, E>(enc);
+    Codex<V, E> result = pIsThreadsafe ? new ThreadsafeCodex<>(pEnum) : new Codex<V, E>(pEnum);
     result.meta().setCompositeKey(pKey);
     return result;
   }
@@ -160,7 +161,7 @@ public final class CodexMagic {
    * @param <V> The type backing the codex
    * @param <E> The enumeration backing the codex
    */
-  private <V, E extends Enum<E> & CodexOf<V>> IEncoderProperties<V> getPropertiesForEnum(Class<E> pEnum) {
+  public <V, E extends Enum<E> & CodexOf<V>> IEncoderProperties<V> getPropertiesForEnum(Class<E> pEnum) {
     return findPropertiesForClass(getTypeOfCodex(pEnum));
   }
   

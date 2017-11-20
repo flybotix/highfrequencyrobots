@@ -45,7 +45,8 @@ public class CompressedEncoder <V, E extends Enum<E> & CodexOf<V>> extends Defau
       decoded[i] = mProps.decodeSingle(pData);
     }
 
-    Codex<V, E> result = new Codex<V, E>(this);
+//    Codex<V, E> result = new Codex<V, E>(this);
+    Codex<V, E> result = new Codex<V, E>(getDefaultValue(), super.getEnum());
     int dataidx = 0;
     for(int e = 0; e < mLength; e++) {
       if(hash.get(e)) {

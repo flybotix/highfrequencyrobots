@@ -2,7 +2,8 @@ package com.flybotix.hfr.codex;
 
 import java.util.Arrays;
 
-import com.flybotix.hfr.codex.encode.AEncoder;
+import com.flybotix.hfr.codex.encode.IEncoderProperties;
+import com.flybotix.hfr.util.lang.EnumUtils;
 
 /**
  * It's like an enum map, but with less safety and better performance.
@@ -17,22 +18,49 @@ import com.flybotix.hfr.codex.encode.AEncoder;
 public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   
   protected CodexMetadata<E> mMeta;
-  protected final AEncoder<V, E> mEncoder;
+//  protected final AEncoder<V, E> mEncoder;
   protected V[] mData;
   protected V mDefaultValue = null;
   
   public static final CodexMagic of = CodexMagic.inst();
   public static final CodexMagic encoder = CodexMagic.inst();
   
-  public Codex(AEncoder<V, E> pEncoder) {
-    this(pEncoder, CodexMetadata.empty(pEncoder.getEnum()));
+  public Codex(V pDefaultValue, CodexMetadata<E> pMeta) {
+    mMeta = pMeta;
+    // A bit complicated ... but effectively we need a helper to know what to cast `V` to since we're using an array.
+    // We could do what ArrayList does and just use an array of objects.  But where's the fun in that?
+    IEncoderProperties<V> props = of.getPropertiesForEnum(mMeta.getEnum());
+    if(props == null) {
+      mData = (V[])new Object[EnumUtils.getLength(pMeta.getEnum())]; // Maybe this doesn't work? who knows.
+      mDefaultValue = pDefaultValue;
+    } else {
+      if(pDefaultValue == null) {
+        mDefaultValue = props.getDefaultValue(true);
+      } else {
+        mDefaultValue = pDefaultValue;
+      }
+      mData = props.generateEmptyArray(EnumUtils.getLength(mMeta.getEnum()), true);
+    }
+    Arrays.fill(mData, mDefaultValue);
   }
   
-  public Codex(AEncoder<V, E> pEncoder, CodexMetadata<E> pMeta) {
-    mData = pEncoder.generateEmptyArray();
-    mMeta = pMeta;
-    mEncoder = pEncoder;
+  public Codex(V pDefaultValue, Class<E> pEnum) {
+    this(pDefaultValue, CodexMetadata.empty(pEnum));
   }
+  
+  public Codex(Class<E> pEnum) {
+    this(null, pEnum);
+  }
+  
+//  public Codex(AEncoder<V, E> pEncoder) {
+//    this(pEncoder, CodexMetadata.empty(pEncoder.getEnum()));
+//  }
+//  
+//  public Codex(AEncoder<V, E> pEncoder, CodexMetadata<E> pMeta) {
+//    mData = pEncoder.generateEmptyArray();
+//    mMeta = pMeta;
+//    mEncoder = pEncoder;
+//  }
   
   /**
    * @return the metadata
@@ -41,23 +69,23 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     return mMeta;
   }
   
-  /**
-   * @return the size (in bytes) of a message which represents this codex
-   */
-  public int size() {
-    return mEncoder.getBufferSizeInBytes();
-  }
+//  /**
+//   * @return the size (in bytes) of a message which represents this codex
+//   */
+//  public int size() {
+//    return mEncoder.getBufferSizeInBytes();
+//  }
   
-  /**
-   * @return the message ID for a comms protocol
-   */
-  public int msgId() {
-    return mEncoder.getMsgId();
-  }
+//  /**
+//   * @return the message ID for a comms protocol
+//   */
+//  public int msgId() {
+//    return mEncoder.getMsgId();
+//  }
   
-  public byte[] encode() {
-    return mEncoder.encode(this);
-  }
+//  public byte[] encode() {
+//    return mEncoder.encode(this);
+//  }
 
   public void setMetadata(CodexMetadata<E> pMeta) {
     mMeta = pMeta;
@@ -70,8 +98,13 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     return mData.length;
   }
   
+//  public void reset() {
+//    Arrays.fill(mData, mEncoder.getDefaultValue());
+//    mMeta.next();
+//  }
+  
   public void reset() {
-    Arrays.fill(mData, mEncoder.getDefaultValue());
+    Arrays.fill(mData, mDefaultValue);
     mMeta.next();
   }
   
@@ -138,7 +171,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
    * @return whether the value at the enum's location is null or equals the codex's default value.
    */
   public boolean isNull(int pOrdinal) {
-    return mData[pOrdinal] == null || mData[pOrdinal].equals(mEncoder.getDefaultValue());
+    return mData[pOrdinal] == null || mData[pOrdinal].equals(mDefaultValue);
   }
 
   /**

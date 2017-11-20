@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexReceiver;
+import com.flybotix.hfr.codex.encode.AEncoder;
 import com.flybotix.hfr.io.Protocols;
 import com.flybotix.hfr.util.lang.IUpdate;
 import com.flybotix.hfr.util.log.ELevel;
@@ -37,11 +38,13 @@ public class TestClientReceiver implements TestConfig{
     private long mLast = 0;
     private long mPeriod = 0;
     private int mLength = 0;
+    private final AEncoder<Double, ETestData> enc = Codex.encoder.of(ETestData.class);
     public void update(Codex<Double, ETestData> codex) {
       mCount++;
       mLength = codex.length();
       long now = System.currentTimeMillis();
-      mSize += codex.encode().length;
+//      mSize += codex.encode().length;
+      mSize += enc.encode(codex).length;
       if(now - mLast >= 1000 * pollingPeriodSecs) {
         mPeriod = (now - mLast)/1000;
         report();

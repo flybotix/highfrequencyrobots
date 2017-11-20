@@ -1,5 +1,9 @@
 package com.flybotix.hfr.codex;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.flybotix.hfr.codex.encode.AEncoder;
 import com.flybotix.hfr.io.EConnectionState;
 import com.flybotix.hfr.io.Protocols;
 import com.flybotix.hfr.io.Protocols.EProtocol;
@@ -63,6 +67,13 @@ public class CodexSender {
       throw new IllegalStateException("Cannot send a message since the comms" +
         " protocol hasn't been iniitialized.  Call initConnection() first.");
     }
-    mSender.sendMessage(pData.msgId(), pData.encode());
+    AEncoder<V,E> enc = null;
+    if(!mEncoders.containsKey(pData.meta().type())) {
+      mEncoders.put(pData.meta().type(), Codex.encoder.of(pData.meta().getEnum()));
+    }
+    enc = (AEncoder<V,E>)mEncoders.get(pData.meta().type());
+    mSender.sendMessage(enc.getMsgId(), enc.encode(pData));
   }
+  
+  private Map<Integer, AEncoder<?,?>> mEncoders = new HashMap<>();
 }

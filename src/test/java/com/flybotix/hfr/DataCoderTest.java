@@ -57,7 +57,8 @@ public class DataCoderTest {
   }
   
   private static Codex<Double, TEST> getRandomArray(double pProbOfData, AEncoder<Double, TEST> pCoder) {
-    Codex<Double, TEST> res = new Codex<>(pCoder);
+//    Codex<Double, TEST> res = new Codex<>(pCoder);
+    Codex<Double, TEST> res = new Codex<>(Double.NaN, TEST.class);
     for(TEST t : TEST.values()) {
       if(Math.random() <= pProbOfData) { 
         res.set(t, Math.random() * 1024d);

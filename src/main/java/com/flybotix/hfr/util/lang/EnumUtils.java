@@ -9,11 +9,23 @@ import java.util.Set;
 public class EnumUtils {
   
   public static <E extends Enum<E>> List<E> getSortedEnums(Class<E> pEnumeration) {
+    return getEnums(pEnumeration, true);
+  }
+  
+  public static <E extends Enum<E>> List<E> getEnums(Class<E> pEnumeration) {
+    return getEnums(pEnumeration, false);
+  }
+  
+  public static <E extends Enum<E>> List<E> getEnums(Class<E> pEnumeration, boolean pSorted) {
     Set<E> set = EnumSet.allOf(pEnumeration);
     List<E> result = new ArrayList<E>();
     result.addAll(set);
     Collections.sort(result, (e1, e2) -> Integer.compare(e1.ordinal(), e2.ordinal()));
     return result;
+  }
+  
+  public static <E extends Enum<E>> int getLength(Class<E> pEnumeration) {
+    return getEnums(pEnumeration, false).size();
   }
   
   @SuppressWarnings("unchecked")

@@ -14,6 +14,7 @@ public class CodexMetadata <E extends Enum<E>> {
   private int mCodexTypeId = 0;
   private long mTimestamp = 0;
   private Integer mKey = -1;
+  private final Class<E> mEnum;
   
   public String toString() {
     return mId + "\t" + mCodexTypeId + "\t" + mTimestamp + "\t" + mKey;
@@ -36,8 +37,13 @@ public class CodexMetadata <E extends Enum<E>> {
    */
   public CodexMetadata(Class<E> pType, int pId, long pTimestamp, Integer pCompositeKey) {
     mCodexTypeId = EnumUtils.hashOf(pType);
+    mEnum = pType;
     mId = pId;
     mKey = pCompositeKey;
+  }
+  
+  public Class<E> getEnum() {
+    return mEnum;
   }
   
   /**

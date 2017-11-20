@@ -12,7 +12,7 @@ public class UncompressedEncoder <V, E extends Enum<E> & CodexOf<V>> extends Def
   }
   
   public AEncoder<V,E> createClone() {
-    return new UncompressedEncoder<V,E>(super.getEnum(), mProps);
+    return new UncompressedEncoder<V,E>(getEnum(), mProps);
   }
 
   @Override
@@ -22,7 +22,8 @@ public class UncompressedEncoder <V, E extends Enum<E> & CodexOf<V>> extends Def
 
   @Override
   protected Codex<V, E> decodeImpl(ByteBuffer pData) {
-    Codex<V, E> result = new Codex<>(this);
+//    Codex<V, E> result = new Codex<>(this);
+    Codex<V, E> result = new Codex<>(getDefaultValue(), getEnum());
     for(int dataidx = 0; dataidx < mLength; dataidx++) {
       result.set(dataidx, mProps.decodeSingle(pData));
     }

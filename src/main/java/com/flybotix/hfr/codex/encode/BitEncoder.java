@@ -41,7 +41,8 @@ public class BitEncoder <E extends Enum<E> & CodexOf<Boolean>> extends AEncoder<
     pData.get(bsarray);
     BitSet hash = BitSet.valueOf(bsarray);
     hash.set(mLength);
-    Codex<Boolean, E> result = new Codex<>(this);
+//    Codex<Boolean, E> result = new Codex<>(this);
+    Codex<Boolean, E> result = new Codex<>(super.getEnum());
     for(int i = 0; i < mLength; i++) {
       result.set(i, hash.get(i));
     }
