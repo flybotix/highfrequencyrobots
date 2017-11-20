@@ -15,7 +15,7 @@ Get the artifact! Latest stable release:
 ```
 groupId: com.flybotix
 artifactId: HighFrequencyRobots
-version: 2017.11.15
+version: 2017.11.20
 
 Dev version: 0.0.20
 ```
@@ -82,6 +82,5 @@ The fact that a Codex must represent data of the same type is simultaneously thi
 1. Export data to CSV with just 1 extra line of setup code
 1. Bandwidth monitoring on the client side
 1. End-to-end test TCP protocol with a live robot
-1. Manage workload of the default client to keep resource usage low during export
 1. Heuristics & warnings about limting quantities of fields, compression vs non-compression, etc.
 1. Manage workload of the default client to keep resource usage low during export
