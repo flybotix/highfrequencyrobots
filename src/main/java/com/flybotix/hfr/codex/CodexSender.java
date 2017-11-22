@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.flybotix.hfr.codex.encode.AEncoder;
 import com.flybotix.hfr.io.EConnectionState;
-import com.flybotix.hfr.io.Protocols;
-import com.flybotix.hfr.io.Protocols.EProtocol;
+import com.flybotix.hfr.io.MessageProtocols;
+import com.flybotix.hfr.io.MessageProtocols.EProtocol;
 import com.flybotix.hfr.io.sender.ISendProtocol;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -51,7 +51,7 @@ public class CodexSender {
    */
   public void initConnection(EProtocol pType, int pHostPort, int pDestPort, String pDestAddr) {
     if(mSender == null) {
-      mSender = Protocols.createSender(pType, pHostPort, pDestPort, pDestAddr);
+      mSender = MessageProtocols.createSender(pType, pHostPort, pDestPort, pDestAddr);
     }
   }
   

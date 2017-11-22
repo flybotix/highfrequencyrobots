@@ -3,7 +3,9 @@ package com.flybotix.hfr.util.lang;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class EnumUtils {
@@ -48,13 +50,20 @@ public class EnumUtils {
     return getSortedEnums(clazz);
   }
   
-  public static <E extends Enum<E>> int hashOf(Class<E> pEnumeration) {
-    Set<E> set = EnumSet.allOf(pEnumeration);
-    int p = 31;
-    int result = 1;
-    for(E e : set) {
-      result = p * result + e.name().hashCode();
+  private static final Map<Class<?>, Integer> hashes = new HashMap<>();
+  
+  public synchronized static <E extends Enum<E>> int hashOf(Class<E> pEnumeration) {
+    if(hashes.containsKey(pEnumeration)) {
+      return hashes.get(pEnumeration);
+    } else {
+      Set<E> set = EnumSet.allOf(pEnumeration);
+      int p = 31;
+      int result = 1;
+      for(E e : set) {
+        result = p * result + e.name().hashCode();
+      }
+      hashes.put(pEnumeration, result);
+      return result;
     }
-    return result;
   }
 }

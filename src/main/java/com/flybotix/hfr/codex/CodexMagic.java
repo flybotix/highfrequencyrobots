@@ -76,24 +76,7 @@ public final class CodexMagic {
   public <V, E extends Enum<E> & CodexOf<V>> void registerEnum(Class<E> pEnum) {
     Class<V> valueClass = getTypeOfCodex(pEnum);
     IEncoderProperties<V> props = findPropertiesForClass(valueClass);
-    registerEnum(pEnum, props);
-  }
-
-  /**
-   * Internally-caches the properties for usage with the codex enumeration.  Helps to ensure
-   * identical encoding behavior when using multiple instances of codexes for a single enumeration.
-   * @param pEnum The codex enumeration.
-   * @param pProperties Encoder Properties
-   * @param <V> The type backing the codex
-   * @param <E> The enumeration backing the codex
-   */
-  public <V, E extends Enum<E> & CodexOf<V>> void registerEnum(Class<E> pEnum, IEncoderProperties<V> pProperties) {
-    if(pProperties == null) {
-      throw new IllegalArgumentException("Cannot create encoders & codexes when the EncoderProperties<V> parameter is null.");
-    }
-    
-    DefaultEncoders<V, E> def = new DefaultEncoders<>(pEnum, pProperties);
-    mDefaultEncoders.put(pEnum, def);
+    registerProperties(pEnum, props);
   }
 
   /**
@@ -203,8 +186,7 @@ public final class CodexMagic {
   }
   
   @SuppressWarnings("unchecked")
-  private static <V, E extends Enum<E> & CodexOf<V>> Class<V> getTypeOfCodex(Class<E> pEnum) {
-//    Class<CodexOf<V>> forcecast = (Class<CodexOf<V>>)pEnum;
+  public static <V, E extends Enum<E> & CodexOf<V>> Class<V> getTypeOfCodex(Class<E> pEnum) {
     Class<CodexOf<V>> forcecast = Class.class.cast(pEnum);
     Type[] iface = forcecast.getGenericInterfaces();
     Class<V> resultType = null;

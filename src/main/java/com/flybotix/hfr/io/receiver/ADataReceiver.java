@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 import com.flybotix.hfr.io.EStaticMessageIds;
 import com.flybotix.hfr.io.MessageQueue;
-import com.flybotix.hfr.io.Protocols;
+import com.flybotix.hfr.io.MessageProtocols;
 import com.flybotix.hfr.util.lang.Delegator;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -201,7 +201,7 @@ public abstract class ADataReceiver <T> extends Delegator<T> implements IReceive
 
     @Override
     public int getBufferSize() {
-      return Protocols.MAX_PACKET_SIZE_BYTES; // Theoretical max TCP/UDP size packet.  Max for NT is unknown.
+      return MessageProtocols.MAX_PACKET_SIZE_BYTES; // Theoretical max TCP/UDP size packet.  Max for NT is unknown.
     }
     
   }

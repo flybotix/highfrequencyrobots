@@ -8,13 +8,15 @@ import com.flybotix.hfr.io.receiver.IReceiveProtocol;
 import com.flybotix.hfr.io.receiver.TCPReceiver;
 import com.flybotix.hfr.io.receiver.UDPReceiver;
 import com.flybotix.hfr.io.sender.ISendProtocol;
+import com.flybotix.hfr.io.sender.NTSender;
 import com.flybotix.hfr.io.sender.TCPSender;
 import com.flybotix.hfr.io.sender.UDPSender;
 
-public class Protocols {
+public class MessageProtocols {
   
   public static final int MAX_PACKET_SIZE_BYTES = 65507; // UDP datagram specification
   public static double MAX_PACKET_RATE_HZ = 50d;
+  public static final String NT_ELEMENT_NAME = MessageProtocols.class.getPackage().getName() + "." + MessageProtocols.class.getName();
   
   public enum EProtocol {
     TCP,
@@ -96,6 +98,9 @@ public class Protocols {
       result = new UDPSender();
       result.setBatching(true);
       break;
+    case NETWORK_TABLES: 
+      result = new NTSender();
+      break;
     default:
     }
 
@@ -108,4 +113,9 @@ public class Protocols {
     
     return result;
   }
+
+  public static ISendProtocol createNTSender(String pTableName) {
+    return createSender(EProtocol.NETWORK_TABLES, -1, -1, pTableName);
+  }
+  
 }

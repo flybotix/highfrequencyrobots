@@ -18,9 +18,9 @@ import com.flybotix.hfr.util.lang.EnumUtils;
 public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   
   protected CodexMetadata<E> mMeta;
-//  protected final AEncoder<V, E> mEncoder;
   protected V[] mData;
   protected V mDefaultValue = null;
+  protected Class<V> mType;
   
   public static final CodexMagic of = CodexMagic.inst();
   public static final CodexMagic encoder = CodexMagic.inst();
@@ -28,7 +28,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   public Codex(V pDefaultValue, CodexMetadata<E> pMeta) {
     mMeta = pMeta;
     // A bit complicated ... but effectively we need a helper to know what to cast `V` to since we're using an array.
-    // We could do what ArrayList does and just use an array of objects.  But where's the fun in that?
+    // We could do what ArrayList does and just use an array of objects.  TODO
     IEncoderProperties<V> props = of.getPropertiesForEnum(mMeta.getEnum());
     if(props == null) {
       mData = (V[])new Object[EnumUtils.getLength(pMeta.getEnum())]; // Maybe this doesn't work? who knows.
@@ -42,6 +42,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
       mData = props.generateEmptyArray(EnumUtils.getLength(mMeta.getEnum()), true);
     }
     Arrays.fill(mData, mDefaultValue);
+    mType = CodexMagic.getTypeOfCodex(pMeta.getEnum());
   }
   
   public Codex(V pDefaultValue, Class<E> pEnum) {
@@ -52,16 +53,6 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     this(null, pEnum);
   }
   
-//  public Codex(AEncoder<V, E> pEncoder) {
-//    this(pEncoder, CodexMetadata.empty(pEncoder.getEnum()));
-//  }
-//  
-//  public Codex(AEncoder<V, E> pEncoder, CodexMetadata<E> pMeta) {
-//    mData = pEncoder.generateEmptyArray();
-//    mMeta = pMeta;
-//    mEncoder = pEncoder;
-//  }
-  
   /**
    * @return the metadata
    */
@@ -69,30 +60,12 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     return mMeta;
   }
   
-//  /**
-//   * @return the size (in bytes) of a message which represents this codex
-//   */
-//  public int size() {
-//    return mEncoder.getBufferSizeInBytes();
-//  }
-  
-//  /**
-//   * @return the message ID for a comms protocol
-//   */
-//  public int msgId() {
-//    return mEncoder.getMsgId();
-//  }
-  
-//  public byte[] encode() {
-//    return mEncoder.encode(this);
-//  }
-
   public void setMetadata(CodexMetadata<E> pMeta) {
     mMeta = pMeta;
   }
   
   /**
-   * @return (effectcively) this is E.values().length
+   * @return (effectively) this is E.values().length
    */
   public int length() {
     return mData.length;
@@ -119,6 +92,9 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     return Arrays.equals(o.mData, mData);
   }
 
+  public Class<V> type() {
+    return mType;
+  }
   
   /**
    * Useful for looping functionss

@@ -5,7 +5,7 @@ import java.util.TimerTask;
 
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexSender;
-import com.flybotix.hfr.io.Protocols;
+import com.flybotix.hfr.io.MessageProtocols;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -16,7 +16,7 @@ public class TestRobotSender implements TestConfig{
 
   public static void main(String[] pArgs) throws Exception{
     Logger.setLevel(ELevel.DEBUG);
-    Protocols.MAX_PACKET_RATE_HZ = MAX_PACKET_RATE_HZ;
+    MessageProtocols.MAX_PACKET_RATE_HZ = MAX_PACKET_RATE_HZ;
     
     CodexSender sender = new CodexSender();
     sender.initConnection(TEST_SOCKET_PROTOCOL, TEST_SENDER_PORT, TEST_RECEIVER_PORT, TEST_RECEIVER_HOST_NAME);

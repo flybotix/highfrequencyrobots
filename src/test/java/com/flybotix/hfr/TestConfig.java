@@ -1,6 +1,6 @@
 package com.flybotix.hfr;
 
-import com.flybotix.hfr.io.Protocols.EProtocol;
+import com.flybotix.hfr.io.MessageProtocols.EProtocol;
 
 interface TestConfig {
   static final double MAX_PACKET_RATE_HZ = 20;

@@ -13,6 +13,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
+import com.flybotix.hfr.io.MessageProtocols;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
@@ -24,6 +25,16 @@ public class TCPSender extends ADataSender {
   private final Executor mThreads = Executors.newFixedThreadPool(2);
 
   private ILog mLog = Logger.createLog(TCPSender.class);
+
+  @Override
+  protected boolean usesNetAddress() {
+    return true;
+  }
+  
+  @Override
+  protected void establishConnection(String addr) {
+    // Not used
+  }
   
   @Override
   protected void establishConnection(InetAddress addr) {
@@ -80,7 +91,6 @@ public class TCPSender extends ADataSender {
             try {
               List<ByteBuffer> messages = mMessageQ.removeAll();
               for(ByteBuffer bb : messages) {
-                mLog.debug("Writing message.");
                 byte[] array = bb.array();
                 mLog.debug(Arrays.toString(array));
                 writer.write(array);
@@ -91,7 +101,7 @@ public class TCPSender extends ADataSender {
               mLog.exception(e);
               break;
             }
-            Thread.sleep(50);
+            Thread.sleep((long)(1000/MessageProtocols.MAX_PACKET_RATE_HZ) * 2);
           }
         } catch (Exception e) {
           mLog.exception(e);

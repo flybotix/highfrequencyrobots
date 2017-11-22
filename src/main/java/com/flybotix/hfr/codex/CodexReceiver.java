@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.flybotix.hfr.codex.encode.AEncoder;
-import com.flybotix.hfr.io.Protocols;
-import com.flybotix.hfr.io.Protocols.EProtocol;
+import com.flybotix.hfr.io.MessageProtocols;
+import com.flybotix.hfr.io.MessageProtocols.EProtocol;
 import com.flybotix.hfr.io.receiver.IMessageParser;
 import com.flybotix.hfr.io.receiver.IReceiveProtocol;
 import com.flybotix.hfr.util.lang.Delegator;
@@ -98,7 +98,7 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
   public IReceiveProtocol startReceiving(EProtocol pType, int pHostPort, String pConnectionInfo) {
     Map<Integer, IMessageParser<?>> parser = new HashMap<>();
     parser.put(mEncoder.getMsgId(), this);
-    mReceiveProtocol = Protocols.createReceiver(pType, pHostPort, pConnectionInfo, parser);
+    mReceiveProtocol = MessageProtocols.createReceiver(pType, pHostPort, pConnectionInfo, parser);
     return mReceiveProtocol;
   }
 }

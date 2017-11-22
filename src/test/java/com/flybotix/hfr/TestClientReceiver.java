@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexReceiver;
 import com.flybotix.hfr.codex.encode.AEncoder;
-import com.flybotix.hfr.io.Protocols;
+import com.flybotix.hfr.io.MessageProtocols;
 import com.flybotix.hfr.util.lang.IUpdate;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
@@ -17,7 +17,7 @@ public class TestClientReceiver implements TestConfig{
   
   public static void main(String[] pArgs) {
     Logger.setLevel(ELevel.DEBUG);
-    Protocols.MAX_PACKET_RATE_HZ = MAX_PACKET_RATE_HZ;
+    MessageProtocols.MAX_PACKET_RATE_HZ = MAX_PACKET_RATE_HZ;
     CodexReceiver<Double, ETestData> codexRecv = new CodexReceiver<>(ETestData.class);
     if(TEST_HIGH_FREQUENCY_DATA_OVER_SOCKET) {
       Logger.setLevel(ELevel.INFO);

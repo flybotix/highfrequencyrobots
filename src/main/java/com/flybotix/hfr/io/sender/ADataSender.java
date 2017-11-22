@@ -10,8 +10,9 @@ import java.util.TimerTask;
 import com.flybotix.hfr.io.ConnectionStatus;
 import com.flybotix.hfr.io.EStaticMessageIds;
 import com.flybotix.hfr.io.MessageQueue;
-import com.flybotix.hfr.io.Protocols;
+import com.flybotix.hfr.io.MessageProtocols;
 import com.flybotix.hfr.util.lang.Delegator;
+import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
@@ -53,7 +54,7 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
     mIsBatching = pUseBatching;
     if(mIsBatching && mBatchTask == null) {
       mBatchTask = new BatchTask(mMessageQ, mBatchQ);
-      long period = (long)Math.ceil(1000d/Protocols.MAX_PACKET_RATE_HZ);
+      long period = (long)Math.ceil(1000d/MessageProtocols.MAX_PACKET_RATE_HZ);
       mBatchTimer.scheduleAtFixedRate(mBatchTask, period, period);
     } else if(!mIsBatching){
       if(mBatchTask != null) {
@@ -64,21 +65,27 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
   }
   
   protected abstract void establishConnection(InetAddress addr);
+  protected abstract void establishConnection(String addr);
+  protected abstract boolean usesNetAddress();
 
 
   @Override
   public final void connect() {
     if(!mStatus.isConnected()) {
-      try {
-        InetAddress addr = InetAddress.getByName(mDestAddress);
-        establishConnection(addr);
-        if(!mIsRegisteredWithShutdown) {
-          Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnect()));
-          mIsRegisteredWithShutdown = true;
+      if(usesNetAddress()) {
+        establishConnection(mDestAddress);
+      } else {
+        try {
+          InetAddress addr = InetAddress.getByName(mDestAddress);
+          establishConnection(addr);
+        } catch (UnknownHostException e) {
+          update(mStatus.errorDuringAttempt());
+          mLog.error(e.getMessage());
         }
-      } catch (UnknownHostException e) {
-        update(mStatus.errorDuringAttempt());
-        mLog.error(e.getMessage());
+      }
+      if(!mIsRegisteredWithShutdown) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnect()));
+        mIsRegisteredWithShutdown = true;
       }
     }
   }
@@ -94,7 +101,9 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
     bb.putInt(pId);
     bb.putInt(pMessage.length);
     bb.put(pMessage);
-    mLog.debug("Adding message " + pId + " with body size " + pMessage.length + " (raw size = " + bb.limit() + ")");
+    if(Logger.isEnabled(ELevel.DEBUG)) {
+      mLog.debug("Adding message " + pId + " with body size " + pMessage.length + " (raw size = " + bb.limit() + ")");
+    }
     try {
       if(mIsBatching) {
         mBatchQ.add(bb);
@@ -127,7 +136,7 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
       try {
         if(!batch.isEmpty()) {
           // wait 2 cycles for the batch to clear, then afterwards just clear it
-          Thread.sleep((long)Math.ceil(2000d/Protocols.MAX_PACKET_RATE_HZ));
+          Thread.sleep((long)Math.ceil(2000d/MessageProtocols.MAX_PACKET_RATE_HZ));
           batch.removeAll();
         }
       } catch (InterruptedException e) {
@@ -144,8 +153,8 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
         // 1- int = Calculated message size
         // 1- int = Number of batched messages
         // remaining = batched messages
-        List<ByteBuffer> buffersToSend = batch.removeAllMessageUpToSize(Protocols.MAX_PACKET_SIZE_BYTES - (3 * Integer.BYTES));
-        if(MessageQueue.getTotalMessageSize(buffersToSend) >= Protocols.MAX_PACKET_SIZE_BYTES * 0.95) {
+        List<ByteBuffer> buffersToSend = batch.removeAllMessageUpToSize(MessageProtocols.MAX_PACKET_SIZE_BYTES - (3 * Integer.BYTES));
+        if(MessageQueue.getTotalMessageSize(buffersToSend) >= MessageProtocols.MAX_PACKET_SIZE_BYTES * 0.95) {
           mLog.warn("Batch packet buffer is close to full.  If this is common consider adjusting Protocols.MAX_PACKET_RATE_HZ.");
         }
         if(!buffersToSend.isEmpty()) {
@@ -157,7 +166,9 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
           for(ByteBuffer bb : buffersToSend) {
             msg.put(bb.array());
           }
-          mLog.info("Sending batched message of size " + msgSize + " with batch header size of " + 3*Integer.BYTES);
+          if(Logger.isEnabled(ELevel.INFO)) {
+            mLog.info("Sending batched message of size " + msgSize + " with batch header size of " + 3*Integer.BYTES);
+          }
           send.add(msg);
         }
       } catch (InterruptedException e) {

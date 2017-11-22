@@ -31,20 +31,20 @@ public class Logger implements ILog {
 
 	@Override
 	public void debug(Object... pOutputs) {
-	  if(LoggingControls.INST.isLevelEnabled(ELevel.DEBUG))
+	  if(isEnabled(ELevel.DEBUG))
 	    LoggingControls.INST.log(ELevel.DEBUG, generateString(pOutputs));
 	}
 
 	@Override
 	public void info(Object... pOutputs) {
-    if(LoggingControls.INST.isLevelEnabled(ELevel.INFO))
+    if(isEnabled(ELevel.INFO))
 		LoggingControls.INST.log(ELevel.INFO, generateString(pOutputs));
 
 	}
 
 	@Override
 	public void warn(Object... pOutputs) {
-    if(LoggingControls.INST.isLevelEnabled(ELevel.WARN))
+    if(isEnabled(ELevel.WARN))
 		LoggingControls.INST.log(ELevel.WARN, generateString(pOutputs));
 
 	}
@@ -76,4 +76,8 @@ public class Logger implements ILog {
 	}
 
 	private static Map<Class<?>, ILog> sDEBUGS = new HashMap<Class<?>, ILog>();
+
+  public static boolean isEnabled(ELevel debug) {
+    return LoggingControls.INST.isLevelEnabled(debug);
+  }
 }
