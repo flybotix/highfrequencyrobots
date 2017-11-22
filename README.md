@@ -11,7 +11,7 @@
  - Includes benchmark & data integrity tests to ensure encode/decode/transit processing times are minimized
 
 ## Getting started
-Get the artifact! Latest stable release:
+Get the artifact! The latest stable release is available at Maven Central:
 ```
 groupId: com.flybotix
 artifactId: HighFrequencyRobots
@@ -35,24 +35,27 @@ public enum RobotData implements CodexOf<Double>{
 ```
 2. On your robot, create a "sender".
 ```java
-ISendProtocol protocol = Protocols.createSender(EProtocol.UDP, 7778, 7777, "localhost");
+// 172.22.11.1 is the default IP of the driver's station when connected over USB
+ISendProtocol protocol = Protocols.createSender(EProtocol.UDP, 7778, 7777, "172.22.11.1");
 CodexSender sender = new CodexSender(protocol);
 ```
 3. On the laptop/client side, create a 'receiver'.  Then register for updates with that receiver.
 ```java
 // Re-use this protocol for all of the receivers
-IReceiveProtocol protocol = Protocols.createReceiver(EProtocol.UDP, 7778, "localhost");
+IReceiveProtocol protocol = Protocols.createReceiver(EProtocol.UDP, 7778, null);
+// A CodexReceiver registers with the protocol and parses ETestData messages received over that protocol
 CodexReceiver<Double, ETestData> receiver = new CodexReceiver<>(ETestData.class, protocol);
+//When a new ETestData message is received, this prints it to the console.
 receiver.addListener(codex -> System.out.println(codex));
 ```
 4.  During robot initialization, create a Codex and pass its reference where it's needed.  Try not to create a 'new' Codex for the same enumeration, as that may cause Java's garbage collection to pause the robot.
 ```java
 // During robot init
-Codex<Double, RobotData> data = Codex.of.thisEnum(RobotData.class);
+Codex<Double, RobotData> data = new Codex(RobotData.class);
 
 // Reset the codex at the beginning of each cycle.  This effectively sets each value to 'null'.  Fill out data throughout each cycle.
 data.reset(); // beginning of the cycle
-data.put(RobotData.pdb2, -23.3d);
+data.put(RobotData.pdb2, pdp.getCurrentForChannel(2));
 data.put(RobotData.gyro, mxp.getGyroRelative());
 
 // Use the data throughout the robot cycle after it's gathered
