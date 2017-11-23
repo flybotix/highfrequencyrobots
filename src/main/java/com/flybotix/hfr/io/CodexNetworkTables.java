@@ -7,11 +7,13 @@ import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexMagic;
 import com.flybotix.hfr.codex.CodexOf;
 import com.flybotix.hfr.util.lang.EnumUtils;
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class CodexNetworkTables {
-  
+  private final ILog mLog = Logger.createLog(CodexNetworkTables.class);
   private Map<Integer, NetworkTable> mTables = new HashMap<>();
   private Map<Integer, Put<?>> mWriters = new HashMap<>();
 
@@ -22,22 +24,23 @@ public class CodexNetworkTables {
    */
   public <V, E extends Enum<E> & CodexOf<V>> void registerCodex(Class<E> pEnum) {
     Integer hash = EnumUtils.hashOf(pEnum);
-    if(!mTables.containsKey(hash)) {
-      mTables.put(hash, NetworkTable.getTable(pEnum.getSimpleName().toUpperCase()));
-    }
-    if(!mWriters.containsKey(hash)) {
-      Class<V> type = CodexMagic.getTypeOfCodex(pEnum);
-      if(type.equals(Double.class)) {
-        mWriters.put(hash, ((nt, key, val) -> nt.putNumber(key, (double)val)));
-      } else if(type.equals(Integer.class)) {
-        mWriters.put(hash, ((nt, key, val) -> nt.putNumber(key, (int)val)));
-      } else if(type.equals(Boolean.class)) {
-        mWriters.put(hash, ((nt, key, val) -> nt.putBoolean(key, (boolean)val)));
-      } else if(type.equals(Float.class)) {
-        mWriters.put(hash, ((nt, key, val) -> nt.putNumber(key, (float)val)));
-      } else {
-        throw new IllegalArgumentException("Type " + type.getSimpleName() + " is not supported by CodexNetworkTables.");
-      }
+    String tablename = pEnum.getSimpleName().toUpperCase();
+    mLog.debug("Registering codex " + tablename + " with hash " + hash);
+    mTables.put(hash, NetworkTable.getTable(tablename));
+    
+    mLog.info(tablename + " is connected: " + mTables.get(hash).isConnected());
+    
+    Class<V> type = CodexMagic.getTypeOfCodex(pEnum);
+    if(type.equals(Double.class)) {
+      mWriters.put(hash, ((nt, key, val) -> nt.putNumber(key, (double)val)));
+    } else if(type.equals(Integer.class)) {
+      mWriters.put(hash, ((nt, key, val) -> nt.putNumber(key, (int)val)));
+    } else if(type.equals(Boolean.class)) {
+      mWriters.put(hash, ((nt, key, val) -> nt.putBoolean(key, (boolean)val)));
+    } else if(type.equals(Float.class)) {
+      mWriters.put(hash, ((nt, key, val) -> nt.putNumber(key, (float)val)));
+    } else {
+      throw new IllegalArgumentException("Type " + type.getSimpleName() + " is not supported by CodexNetworkTables.");
     }
   }
 
@@ -48,18 +51,25 @@ public class CodexNetworkTables {
    */
   public <V, E extends Enum<E> & CodexOf<V>> void send(Codex<V,E> pCodex) {
     int hash = EnumUtils.hashOf(pCodex.meta().getEnum());
-    NetworkTable nt = mTables.get(hash);
-    if(nt == null) {
-      registerCodex(pCodex.meta().getEnum());
-      nt = mTables.get(hash);
+    
+    if(!mWriters.containsKey(hash) || !mTables.containsKey(hash)) {
+      mLog.warn("Cannot send codex " + pCodex.meta().getEnum().getSimpleName() + " because it has not been registered.");
+      return;
     }
+
+    @SuppressWarnings("unchecked")
+    Put<V> writer = (Put<V>)mWriters.get(hash);
+    NetworkTable nt = mTables.get(hash);
+    
     nt.putNumber("ID", pCodex.meta().id());
     nt.putNumber("KEY", pCodex.meta().key());
     nt.putNumber("TIME_NS", pCodex.meta().timeNanos());
-    @SuppressWarnings("unchecked")
-    Put<V> writer = (Put<V>)mWriters.get(hash);
     for(E e : EnumSet.allOf(pCodex.meta().getEnum())) {
-      writer.write(nt, e.name().toUpperCase(), pCodex.get(e));
+      if(pCodex.isSet(e)) {
+        writer.write(nt, e.name().toUpperCase(), pCodex.get(e));
+      }
+      
+      // grumble grumble.... NT doesn't have a way to clear a field.
     }
   }
   
