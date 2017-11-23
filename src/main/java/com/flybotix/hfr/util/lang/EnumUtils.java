@@ -66,4 +66,9 @@ public class EnumUtils {
       return result;
     }
   }
+  
+  @SuppressWarnings("unchecked")
+  public synchronized static <E extends Enum<E>> int hashOf(E pEnumeration) {
+    return hashOf(pEnumeration.getClass());
+  }
 }

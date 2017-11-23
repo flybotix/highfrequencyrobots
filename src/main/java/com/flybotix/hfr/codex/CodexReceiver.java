@@ -1,6 +1,7 @@
 package com.flybotix.hfr.codex;
 
 import java.nio.ByteBuffer;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import com.flybotix.hfr.io.MessageProtocols.EProtocol;
 import com.flybotix.hfr.io.receiver.IMessageParser;
 import com.flybotix.hfr.io.receiver.IReceiveProtocol;
 import com.flybotix.hfr.util.lang.Delegator;
+import com.flybotix.hfr.util.lang.IUpdate;
 
 /**
  * Protocol-agnostic receiver that parses codex messages. This presumes that each
@@ -32,6 +34,7 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
 
   protected final AEncoder<V, E> mEncoder;
   protected IReceiveProtocol mReceiveProtocol = null;
+  protected final Map<E, Delegator<V>> mElementListeners = new HashMap<>();
   
   /**
    * Creates a receiver using the input encoder.  This encoder is necessary in order to
@@ -40,6 +43,15 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
    */
   public CodexReceiver(AEncoder<V, E> pEncoder) {
     mEncoder = pEncoder;
+    final EnumSet<E> set = EnumSet.allOf(pEncoder.getEnum());
+    for(E e : set) {
+      mElementListeners.put(e, new Delegator<>());
+    }
+    super.addListener(codex -> {
+      for(E e : set) {
+        mElementListeners.get(e).update(codex.get(e));
+      }
+    });
   }
   
   /**
@@ -86,6 +98,26 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
   @Override
   public int getBufferSize() {
     return mEncoder.getBufferSizeInBytes(); 
+  }
+  
+  /**
+   * Listen for an individual element of the codex, rather than the whole codex
+   * @param pElement Element of the codex's enumeration
+   * @param pListener Code to execute when the codex is received
+   * @return the latest data received
+   */
+  public V addElementListener(E pElement, IUpdate<V> pListener) {
+    mElementListeners.get(pElement).addListener(pListener);
+    return mElementListeners.get(pElement).getLatest();
+  }
+  
+  /**
+   * Removes a listener for an individual element of the codex
+   * @param pElement Element of the codex's enumeration
+   * @param pListener Code to execute when the codex is received
+   */
+  public void removeElementListener(E pElement, IUpdate<V> pListener) {
+    mElementListeners.get(pElement).removeListener(pListener);
   }
   
   /**

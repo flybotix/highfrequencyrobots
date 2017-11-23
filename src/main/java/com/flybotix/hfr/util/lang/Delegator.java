@@ -27,7 +27,7 @@ public class Delegator<T> implements IProvider<T> {
     mListeners = new CopyOnWriteArrayList<>();
   }
 
-  protected final void update(T pUpdate) {
+  public final void update(T pUpdate) {
     mLatest = pUpdate;
     for (IUpdate<T> u : mListeners) {
       try {
