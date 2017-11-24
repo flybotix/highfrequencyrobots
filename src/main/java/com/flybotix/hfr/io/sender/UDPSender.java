@@ -36,7 +36,7 @@ public class UDPSender extends ADataSender{
   protected void establishConnection(InetAddress addr) {
     try {
       socket = new DatagramSocket(mHostPort);
-      mLog.debug("Established local socket at ", mHostPort);
+      mLog.debug("Established local socket at ", mHostPort, " with a destination of ", addr, ":", mDestPort);
       update(mStatus.connectionEstablished());
     } catch (SocketException e) {
       e.printStackTrace();

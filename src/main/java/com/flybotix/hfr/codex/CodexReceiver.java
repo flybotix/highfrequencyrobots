@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.flybotix.hfr.cache.CodexElementInstance;
 import com.flybotix.hfr.codex.encode.AEncoder;
 import com.flybotix.hfr.io.MessageProtocols;
 import com.flybotix.hfr.io.MessageProtocols.EProtocol;
@@ -34,7 +35,7 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
 
   protected final AEncoder<V, E> mEncoder;
   protected IReceiveProtocol mReceiveProtocol = null;
-  protected final Map<E, Delegator<V>> mElementListeners = new HashMap<>();
+  protected final Map<E, Delegator<CodexElementInstance<V,E>>> mElementListeners = new HashMap<>();
   
   /**
    * Creates a receiver using the input encoder.  This encoder is necessary in order to
@@ -49,7 +50,7 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
     }
     super.addListener(codex -> {
       for(E e : set) {
-        mElementListeners.get(e).update(codex.get(e));
+        mElementListeners.get(e).update(new CodexElementInstance<V,E>(codex.mMeta.timeNanos(), codex.get(e), e));
       }
     });
   }
@@ -106,7 +107,7 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
    * @param pListener Code to execute when the codex is received
    * @return the latest data received
    */
-  public V addElementListener(E pElement, IUpdate<V> pListener) {
+  public CodexElementInstance<V,E> addElementListener(E pElement, IUpdate<CodexElementInstance<V,E>> pListener) {
     mElementListeners.get(pElement).addListener(pListener);
     return mElementListeners.get(pElement).getLatest();
   }
@@ -116,7 +117,7 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
    * @param pElement Element of the codex's enumeration
    * @param pListener Code to execute when the codex is received
    */
-  public void removeElementListener(E pElement, IUpdate<V> pListener) {
+  public void removeElementListener(E pElement, IUpdate<CodexElementInstance<V,E>> pListener) {
     mElementListeners.get(pElement).removeListener(pListener);
   }
   

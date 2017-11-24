@@ -72,7 +72,7 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
   @Override
   public final void connect() {
     if(!mStatus.isConnected()) {
-      if(usesNetAddress()) {
+      if(!usesNetAddress()) {
         establishConnection(mDestAddress);
       } else {
         try {

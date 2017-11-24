@@ -57,10 +57,10 @@ public class EnumUtils {
       return hashes.get(pEnumeration);
     } else {
       Set<E> set = EnumSet.allOf(pEnumeration);
-      int p = 31;
+      final int p = 31;
       int result = 1;
       for(E e : set) {
-        result = p * result + e.name().hashCode();
+        result += p * result + e.name().hashCode();
       }
       hashes.put(pEnumeration, result);
       return result;
