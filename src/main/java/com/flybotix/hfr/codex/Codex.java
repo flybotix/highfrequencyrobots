@@ -1,6 +1,7 @@
 package com.flybotix.hfr.codex;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 
 import com.flybotix.hfr.codex.encode.IEncoderProperties;
 import com.flybotix.hfr.util.lang.EnumUtils;
@@ -54,6 +55,16 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   }
   
   /**
+   * Takes the value from the E2 codex and inserts it into the 'ToField'.
+   * @param pOtherCodex The codex to pull the data from
+   * @param pFromField The field in the other codex to get the data from
+   * @param pToField The field in this codex to put the data into.
+   */
+  public <E2 extends Enum<E2> & CodexOf<V>> void map(Codex<V, E2> pOtherCodex, E2 pFromField, E pToField) {
+    
+  }
+  
+  /**
    * @return the metadata
    */
   public CodexMetadata<E> meta() {
@@ -71,10 +82,29 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     return mData.length;
   }
   
-//  public void reset() {
-//    Arrays.fill(mData, mEncoder.getDefaultValue());
-//    mMeta.next();
-//  }
+  public String getCSVHeader() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Codex Name").append(',');
+    sb.append("Key").append(',');
+    sb.append("Id").append(',');
+    sb.append("Time (ns)").append(',');
+    for(E e : EnumSet.allOf(meta().getEnum())) {
+      sb.append(e.toString()).append(',');
+    }
+    return sb.toString();
+  }
+  
+  public String toCSV() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(meta().getEnum().getSimpleName()).append(',');
+    sb.append(meta().key()).append(',');
+    sb.append(meta().id()).append(',');
+    sb.append(meta().timeNanos()).append(',');
+    for(int i = 0; i < mData.length; i++) {
+      sb.append(mData[i]).append(',');
+    }
+    return sb.toString();
+  }
   
   public void reset() {
     Arrays.fill(mData, mDefaultValue);
