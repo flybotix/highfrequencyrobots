@@ -12,6 +12,7 @@
          - Creates 1 table per registered Codex enumeration
          - Writes the codex metadata to their respective fields.
          - Loops through the enumeration's values and writes each to the field corresponding to enueration.name()
+         - Should be compatible with any NetworkTables "viewer", though this hasn't yet been tested
          - NOTE - of all available protocols, this is the only one that cannot handle a `null` element value.
      - Passthrough (WIP)
          - Uses a basic listener/update interface
@@ -28,7 +29,7 @@ groupId: com.flybotix
 artifactId: HighFrequencyRobots
 version: 2017.11.20
 
-Dev version: 0.0.23
+Dev version: 0.0.23 (currently has NT by-element, but needs more testing)
 ```
 1. Create an enumeration that describes your data while implementing the CodexOf interface.  Both sides of the comms link will need this enumeration at compile time.  Since enumerations are lists of static objects, you can also do anything else you want with your enumeration (descriptions, short descriptions, inheritance, etc).
 ```java
