@@ -3,19 +3,19 @@
  - The Codex is an enumeration-backed auto-normalized data structure with design considerations for an IoT-centric comms protocol.
  - The library handles threading & socket comms internally, so robot code doesn't have to.  This includes batching of multiple tiny 'messages' in order to stay within the limitations of packet sizes and network rates.
  - The following protocols are available now or are inteded to become available:
-     - UDP
-     - TCP (with connection retry logic)
-     - NetworkTables Raw (WIP-late Dec)
+     - **UDP**
+     - **TCP** (with connection retry logic)
+     - **NetworkTables Raw** (WIP-late Dec)
          - Encodes Codexes like UDP & TCP, then sends the `byte[]` array over NT
-     - NetworkTables By-Element
+     - **NetworkTables By-Element**
          - Creates 1 table per registered Codex enumeration
          - Writes the codex metadata (time, index, & composite key) to their respective fields
          - Loops through the enumeration's values and writes each to the field corresponding to enueration.name()
          - Should be compatible with any NetworkTables "viewer" (testing WIP)
-         - NOTE - of all available protocols, this is the only one that cannot handle a `null` element value
+         - *NOTE* - of all available protocols, this is the only one that cannot handle a `null` element value
              - That simply means NetworkTables will show the 'last' good value when something goes wrong
              - The protocol will eventually have a configuration to set a default NT value of (e.g.) 0 when the codex data is `null`
-     - Passthrough (WIP-late Dec)
+     - **Passthrough** (WIP-late Dec)
          - Uses a basic Java listener/update interface
          - Codex data stays within the same process, and does not go remote
          - Useful for writing codex data to CSV from within the same process, or using Codexes to update a display
@@ -24,15 +24,15 @@
  - Includes auto-incrementing metadata that keeps track of cycles for Codexes, which allows normalization of the data structure the Codex represents.
  - Includes benchmark & data integrity tests to ensure encode/decode/transit processing times are minimized.
 
-## Getting started
-Get the artifact! The latest stable release is available at Maven Central:
-```
-groupId: com.flybotix
+## Get the Artifact
+The latest stable release is available at **Maven Central**:
+```groupId: com.flybotix
 artifactId: HighFrequencyRobots
 version: 2017.11.25
-
 Dev version: 0.0.23 (11/24)
 ```
+
+## Get Coding
 1. Create an enumeration that describes your data while implementing the CodexOf interface.  Both sides of the comms link will need this enumeration at compile time.  Since enumerations are lists of static objects, you can also do anything else you want with your enumeration (descriptions, short descriptions, inheritance, etc).
 ```java
 import com.flybotix.hfr.codex.CodexOf;
