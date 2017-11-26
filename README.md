@@ -1,5 +1,4 @@
-# High Frequency Data framework, meant for WiFi-based robots
-
+# High Frequency Data Framework
 ## What it does, and why
  - HFR is an enumeration-backed data structure with an IoT-centric comms protocol.
  - HFR deals with threading & socket comms internally, so robot code doesn't have to.  This includes batching of multiple tiny 'messages' in order to stay within the limitations of packet sizes and network rates.
