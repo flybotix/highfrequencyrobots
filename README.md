@@ -26,7 +26,8 @@
 
 ## Get the Artifact
 The latest stable release is available at **Maven Central**:
-```groupId: com.flybotix
+```
+groupId: com.flybotix
 artifactId: HighFrequencyRobots
 version: 2017.11.25
 Dev version: 0.0.23 (11/24)
