@@ -1,6 +1,7 @@
 package com.flybotix.hfr.codex;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
 
 import com.flybotix.hfr.util.lang.EnumUtils;
 
@@ -12,7 +13,7 @@ public class CodexMetadata <E extends Enum<E>> {
 
   private int mId = 0;
   private int mCodexTypeId = 0;
-  private long mTimestamp = 0;
+  private double mTimestamp = 0;
   private Integer mKey = -1;
   private final Class<E> mEnum;
   
@@ -23,23 +24,24 @@ public class CodexMetadata <E extends Enum<E>> {
   /**
    * @param pType Enum that backs the codex
    * @param pId Initial instance id.  This will get incremented upon reset().
-   * @param pTimestamp Initial timestamp, in nanoseconds.
+   * @param pTimestamp the timestamp with units matching E.getTimestampUnit (default = seconds).
    */
-  public CodexMetadata(Class<E> pType, int pId, long pTimestamp) {
+  public CodexMetadata(Class<E> pType, int pId, double pTimestamp) {
 	  this(pType, pId, pTimestamp, -1);
   }
   
   /**
    * @param pType Enum that backs the codex
    * @param pId Initial instance id.  This will get incremented upon reset().
-   * @param pTimestamp Initial timestamp, in nanoseconds.
+   * @param pTimestamp the timestamp with units matching E.getTimestampUnit (default = seconds).
    * @param pCompositeKey Allows for an un-changing identifier so that an enumeration may represent multiple counts of the same object type.
    */
-  public CodexMetadata(Class<E> pType, int pId, long pTimestamp, Integer pCompositeKey) {
+  public CodexMetadata(Class<E> pType, int pId, double pTimestamp, Integer pCompositeKey) {
     mCodexTypeId = EnumUtils.hashOf(pType);
     mEnum = pType;
     mId = pId;
     mKey = pCompositeKey;
+    mTimestamp = pTimestamp;
   }
   
   public Class<E> getEnum() {
@@ -60,7 +62,7 @@ public class CodexMetadata <E extends Enum<E>> {
   public void next(boolean pUpdateTime) {
     mId++;
     if(pUpdateTime) {
-      setTimeNanos(System.nanoTime());
+      setTimestamp(System.nanoTime());
     }
   }
   
@@ -82,15 +84,9 @@ public class CodexMetadata <E extends Enum<E>> {
   }
   
   /**
-   * Note - if the setTimeNanos() method is called, the caller
-   * has full control over whether it is a system-relative time
-   * or whether it is nanoseconds relative to some specific point in
-   * time (such as match start).  Consult that code for what to expect here.
-   * <br><br>If nothing overrides the timestamp, then this method will be
-   * the equivalent of the latest System.nanoTime() call.
-   * @return the timestamp in nanos.
+   * @return the timestamp with units matching E.getTimestampUnit (default = seconds).
    */
-  public long timeNanos() {
+  public double timestamp() {
     return mTimestamp;
   }
   
@@ -100,9 +96,9 @@ public class CodexMetadata <E extends Enum<E>> {
    * or whether it is nanoseconds relative to some specific point in
    * time (such as match start).  So technically a coder could choose
    * milliseconds here, although that defeats the purpose of one-codex-per-cycle.
-   * @param pTimestamp time in nanoseconds
+   * @param pTimestamp the timestamp with units matching E.getTimestampUnit (default = seconds).
    */
-  public void setTimeNanos(long pTimestamp) {
+  public void setTimestamp(double pTimestamp) {
     mTimestamp = pTimestamp;
   }
   
@@ -119,14 +115,14 @@ public class CodexMetadata <E extends Enum<E>> {
    * @return the transmitted size of the metadata
    */
   public static int sizeOf() {
-    return Integer.BYTES + Long.BYTES + Integer.BYTES; 
+    return Integer.BYTES + Double.BYTES + Integer.BYTES; 
   }
   
   /**
    * @return a byte array that can be decoded via CodexMetadata.parse()
    */
   public byte[] encode() {
-    return ByteBuffer.allocate(sizeOf()).putInt(mId).putLong(mTimestamp).putInt(mKey).array();
+    return ByteBuffer.allocate(sizeOf()).putInt(mId).putDouble(mTimestamp).putInt(mKey).array();
   }
   
   public void setCompositeKey(int pKey) {
@@ -139,7 +135,7 @@ public class CodexMetadata <E extends Enum<E>> {
    * @return a Codex Meta data object, supposing nothing went wrong
    */
   public static <E extends Enum<E>> CodexMetadata<E> parse(Class<E> pEnum, ByteBuffer pData) {
-    return new CodexMetadata<E>(pEnum, pData.getInt(), pData.getLong(), pData.getInt());
+    return new CodexMetadata<E>(pEnum, pData.getInt(), pData.getDouble(), pData.getInt());
   }
 
   /**

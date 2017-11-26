@@ -61,7 +61,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
    * @param pToField The field in this codex to put the data into.
    */
   public <E2 extends Enum<E2> & CodexOf<V>> void map(Codex<V, E2> pOtherCodex, E2 pFromField, E pToField) {
-    
+    set(pToField, pOtherCodex.get(pFromField));
   }
   
   /**
@@ -99,7 +99,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     sb.append(meta().getEnum().getSimpleName()).append(',');
     sb.append(meta().key()).append(',');
     sb.append(meta().id()).append(',');
-    sb.append(meta().timeNanos()).append(',');
+    sb.append(meta().timestamp()).append(',');
     for(int i = 0; i < mData.length; i++) {
       sb.append(mData[i]).append(',');
     }

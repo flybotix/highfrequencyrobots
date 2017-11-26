@@ -63,7 +63,7 @@ public class CodexNetworkTables {
     
     nt.putNumber("ID", pCodex.meta().id());
     nt.putNumber("KEY", pCodex.meta().key());
-    nt.putNumber("TIME_NS", pCodex.meta().timeNanos());
+    nt.putNumber("TIME_NS", pCodex.meta().timestamp());
     for(E e : EnumSet.allOf(pCodex.meta().getEnum())) {
       if(pCodex.isSet(e)) {
         writer.write(nt, e.name().toUpperCase(), pCodex.get(e));

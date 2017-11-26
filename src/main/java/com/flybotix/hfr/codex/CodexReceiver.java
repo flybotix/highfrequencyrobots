@@ -50,7 +50,7 @@ public class CodexReceiver<V, E extends Enum<E> & CodexOf<V>> extends Delegator<
     }
     super.addListener(codex -> {
       for(E e : set) {
-        mElementListeners.get(e).update(new CodexElementInstance<V,E>(codex.mMeta.timeNanos(), codex.get(e), e));
+        mElementListeners.get(e).update(new CodexElementInstance<V,E>(codex.mMeta.timestamp(), codex.get(e), e));
       }
     });
   }

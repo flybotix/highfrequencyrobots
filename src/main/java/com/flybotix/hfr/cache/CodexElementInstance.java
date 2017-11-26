@@ -9,9 +9,9 @@ import com.flybotix.hfr.codex.CodexOf;
  */
 public class CodexElementInstance <V, E extends Enum<E> & CodexOf<V>>{
   public final V value;
-  public final long time;
+  public final double time;
   public final E element;
-  public CodexElementInstance(long pTime, V pValue, E pElement) {
+  public CodexElementInstance(double pTime, V pValue, E pElement) {
     time = pTime;
     value = pValue;
     element = pElement;
