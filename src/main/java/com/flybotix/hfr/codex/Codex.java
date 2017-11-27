@@ -5,6 +5,7 @@ import java.util.EnumSet;
 
 import com.flybotix.hfr.codex.encode.IEncoderProperties;
 import com.flybotix.hfr.util.lang.EnumUtils;
+import com.flybotix.hfr.util.lang.IConverter;
 
 /**
  * It's like an enum map, but with less safety and better performance.
@@ -26,6 +27,11 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   public static final CodexMagic of = CodexMagic.inst();
   public static final CodexMagic encoder = CodexMagic.inst();
   
+  /**
+   * Creates a new Codex with the set metadata and default value
+   * @param pDefaultValue
+   * @param pMeta
+   */
   public Codex(V pDefaultValue, CodexMetadata<E> pMeta) {
     mMeta = pMeta;
     // A bit complicated ... but effectively we need a helper to know what to cast `V` to since we're using an array.
@@ -46,10 +52,19 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     mType = CodexMagic.getTypeOfCodex(pMeta.getEnum());
   }
   
+  /**
+   * Creates a Codex with the set default value and a blank metadata object
+   * @param pDefaultValue Default value to set.  May be null
+   * @param pEnum Enumeration backing the codex.  May NOT be null.
+   */
   public Codex(V pDefaultValue, Class<E> pEnum) {
     this(pDefaultValue, CodexMetadata.empty(pEnum));
   }
   
+  /**
+   * Creates a Codex with <code>null</code> as the default value
+   * @param pEnum Enumeration backing the codex.  May NOT be null.
+   */
   public Codex(Class<E> pEnum) {
     this(null, pEnum);
   }
@@ -71,6 +86,10 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     return mMeta;
   }
   
+  /**
+   * Overrides the metadata
+   * @param pMeta The new metadata
+   */
   public void setMetadata(CodexMetadata<E> pMeta) {
     mMeta = pMeta;
   }
@@ -83,29 +102,66 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   }
   
   public String getCSVHeader() {
+    EnumSet<E> set = EnumSet.allOf(meta().getEnum());
+    String tu = set.iterator().next().getTimestampShortString();
     StringBuilder sb = new StringBuilder();
     sb.append("Codex Name").append(',');
     sb.append("Key").append(',');
     sb.append("Id").append(',');
-    sb.append("Time (ns)").append(',');
-    for(E e : EnumSet.allOf(meta().getEnum())) {
-      sb.append(e.toString()).append(',');
+    sb.append("Time ").append(tu).append(',');
+    for(E e : set) {
+      sb.append(e.toString().replaceAll("_", " ")).append(',');
     }
     return sb.toString();
   }
   
+  /**
+   * @return A CSV string that represents this instance of the Codex, including metadata
+   */
   public String toCSV() {
+    return toCSV(from -> from.toString());
+  }
+  
+  /**
+   * @param pToString A custom converter to print a single element of an object
+   * @return A CSV string that represents this instance of the Codex, including metadata
+   */
+  public String toCSV(IConverter<V, String> pToString) {
     StringBuilder sb = new StringBuilder();
     sb.append(meta().getEnum().getSimpleName()).append(',');
     sb.append(meta().key()).append(',');
     sb.append(meta().id()).append(',');
     sb.append(meta().timestamp()).append(',');
     for(int i = 0; i < mData.length; i++) {
-      sb.append(mData[i]).append(',');
+      sb.append(pToString.convert(mData[i])).append(',');
     }
     return sb.toString();
   }
   
+  /**
+   * @param pCSV String to parse
+   * @param pParser Converter to from a String to the type represented by <code>V</code>
+   * @return Whether this was successful.
+   */
+  public boolean fillFromCSV(String pCSV, IConverter<String, V> pParser) {
+    String[] elements = pCSV.split(",");
+    if(elements[0].equalsIgnoreCase(meta().getEnum().getSimpleName())) {
+      return false;
+    }
+    meta().setCompositeKey(Integer.parseInt(elements[1]));
+    meta().overrideId(Integer.parseInt(elements[2]));
+    meta().setTimestamp(Double.parseDouble(elements[3]));
+    
+    for(int i = 0; i < length(); i++) {
+      set(i, pParser.convert(elements[i+4]));
+    }
+    
+    return true;
+  }
+  
+  /**
+   * Resets the data to the default value (which is usually <code>null</code>
+   */
   public void reset() {
     Arrays.fill(mData, mDefaultValue);
     mMeta.next();
@@ -122,6 +178,9 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     return Arrays.equals(o.mData, mData);
   }
 
+  /**
+   * @return the class representing the type of the data
+   */
   public Class<V> type() {
     return mType;
   }

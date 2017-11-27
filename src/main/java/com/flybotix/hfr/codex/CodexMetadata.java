@@ -74,6 +74,10 @@ public class CodexMetadata <E extends Enum<E>> {
     return mId;
   }
   
+  /*package*/ void overrideId(Integer id) {
+    mId = id;
+  }
+  
   /**
    * This is set by calling EnumUtils.hashOf() with the enum class.  In theory this
    * matches the potential message id, but that isn't the case for batched messages.
