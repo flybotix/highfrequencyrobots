@@ -49,7 +49,7 @@ public class CodexSender {
    * @param pDestPort The destination port of the receiver
    * @param pDestAddr The destination address of the receiver (IP Address or hostnames work.  URL's and FQDN's are untested.)
    */
-  public void initConnection(EProtocol pType, int pHostPort, int pDestPort, String pDestAddr) {
+  public void initConnection(EProtocol pType, int pHostPort, int pDestPort, String... pDestAddr) {
     if(mSender == null) {
       mSender = MessageProtocols.createSender(pType, pHostPort, pDestPort, pDestAddr);
     }

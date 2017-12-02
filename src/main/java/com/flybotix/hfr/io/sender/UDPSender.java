@@ -33,6 +33,23 @@ public class UDPSender extends ADataSender{
   }
 
   @Override
+  protected void establishConnection(InetAddress... addr) {
+    for(InetAddress address : addr) {
+      if(address != null) {
+        try {
+          boolean reachable = address.isReachable(2000);
+          if(reachable) {
+            establishConnection(address);
+            break;
+          }
+        } catch (IOException e) {
+          mLog.exception(e);
+        }
+      }
+    }
+  }
+
+  @Override
   protected void establishConnection(InetAddress addr) {
     try {
       socket = new DatagramSocket(mHostPort);

@@ -6,7 +6,7 @@ import com.flybotix.hfr.util.lang.IProvider;
 
 public interface ISendProtocol extends IProvider<ConnectionStatus> {
 
-  public void setDestAddress(String pAddress);
+  public void setDestAddress(String... pAddress);
   public void setDestPort(int pPort);
   public void setHostPort(int pPort);
   /**

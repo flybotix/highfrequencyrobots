@@ -88,6 +88,24 @@ public class MessageProtocols {
    * @return an interface to the protocol
    */
   public static ISendProtocol createSender(EProtocol pType, int pHostPort, int pDestPort, String pDestAddr) {
+    return createSender(pType, pHostPort, pDestPort, pDestAddr);
+  }
+  
+  /**
+   * Creates a send protocol based upon the Protocol type.  This thread does not block (even for TCP) since
+   * the receivers handle connections in their own thread pool.  There are no guarantees that messages
+   * sent prior to an actual connection (i.e. TCP) will be received by the other side.
+   * <br><br>
+   * Also note that for the time being, TCP and UDP protocols will use batching. 
+   * 
+   * @param pType UDP, TCP, NetworkTables, or Passthrough.  Currently, only TCP and UDP are supported.
+   * @param pHostPort The port that will be bound to in order to send data.
+   * @param pDestPort The destination port of the receiver.
+   * @param pDestAddresses The destination address.  Accepts hostname or IP address.  The API will run through each host/ip
+   * in the array and connect to the first one that's available.
+   * @return an interface to the protocol
+   */
+  public static ISendProtocol createSender(EProtocol pType, int pHostPort, int pDestPort, String... pDestAddresses) {
     ISendProtocol result = null;
     switch(pType) {
     case TCP: 
@@ -105,7 +123,7 @@ public class MessageProtocols {
     }
 
     if(result != null) {
-      result.setDestAddress(pDestAddr);
+      result.setDestAddress(pDestAddresses);
       result.setHostPort(pHostPort);
       result.setDestPort(pDestPort);
       result.connect();

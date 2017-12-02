@@ -35,6 +35,11 @@ public class TCPSender extends ADataSender {
   protected void establishConnection(String addr) {
     // Not used
   }
+
+  @Override
+  protected void establishConnection(InetAddress... addr) {
+    // TODO
+  }
   
   @Override
   protected void establishConnection(InetAddress addr) {

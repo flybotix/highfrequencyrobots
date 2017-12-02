@@ -21,7 +21,9 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
   private final MessageQueue mBatchQ = new MessageQueue();
   protected int mDestPort;
   protected int mHostPort;
+  //TODO - a bit of a temporary hack to keep both.  Just preserving functionality through refactoring
   protected String mDestAddress;
+  protected String[] mDestAddresses;
   protected final ConnectionStatus mStatus = new ConnectionStatus();
   protected boolean mIsBatching = false;
   private boolean mIsRegisteredWithShutdown = false;
@@ -44,8 +46,12 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
   }
   
   @Override
-  public void setDestAddress(String pAddress) {
-    mDestAddress = pAddress;
+  public void setDestAddress(String... pAddress) {
+    if(pAddress != null && pAddress.length == 1) {
+      mDestAddress = pAddress[0];
+    } else {
+      mDestAddresses = pAddress;
+    }
     reconnectIfLive();
   }
   
@@ -65,6 +71,7 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
   }
   
   protected abstract void establishConnection(InetAddress addr);
+  protected abstract void establishConnection(InetAddress... addrs);
   protected abstract void establishConnection(String addr);
   protected abstract boolean usesNetAddress();
 
@@ -75,13 +82,32 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
       if(!usesNetAddress()) {
         establishConnection(mDestAddress);
       } else {
-        try {
-          InetAddress addr = InetAddress.getByName(mDestAddress);
-          establishConnection(addr);
-        } catch (UnknownHostException e) {
-          update(mStatus.errorDuringAttempt());
-          mLog.error(e.getMessage());
-        }
+          if(mDestAddress != null) {
+            try {
+              InetAddress addr = InetAddress.getByName(mDestAddress);
+              establishConnection(addr);
+            } catch (UnknownHostException e) {
+              update(mStatus.errorDuringAttempt());
+              mLog.error(e.getMessage());
+            }
+          } else {
+            InetAddress[] addrs = new InetAddress[mDestAddresses.length];
+            boolean anyFound = false;
+            for(int i = 0; i < mDestAddresses.length; i++) {
+              try {
+                addrs[i] = InetAddress.getByName(mDestAddresses[i]);
+                anyFound = true;
+              } catch (UnknownHostException e) {
+                mLog.warn("Unknown Host - ", mDestAddresses[i], "\t",e.getMessage());
+              }
+            }
+            if(anyFound) {
+              establishConnection(addrs);
+            } else {
+              mLog.error("Unable to find any hosts.  Cancelling connection request.");
+              update(mStatus.errorDuringAttempt());
+            }
+          }
       }
       if(!mIsRegisteredWithShutdown) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnect()));

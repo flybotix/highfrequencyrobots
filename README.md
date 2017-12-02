@@ -30,7 +30,7 @@ The latest stable release is available at **Maven Central**:
 groupId: com.flybotix
 artifactId: HighFrequencyRobots
 version: 2017.11.25
-Dev version: 0.0.25 (11/26)
+Dev version: 0.0.26 (12/1)
 ```
 
 ## Get Coding

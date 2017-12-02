@@ -119,7 +119,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
    * @return A CSV string that represents this instance of the Codex, including metadata
    */
   public String toCSV() {
-    return toCSV(from -> from.toString());
+    return toCSV(from -> from == null ? "" : from.toString());
   }
   
   /**
