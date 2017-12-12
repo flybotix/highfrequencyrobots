@@ -141,12 +141,12 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   /**
    * @param pCSV String to parse
    * @param pParser Converter to from a String to the type represented by <code>V</code>
-   * @return Whether this was successful.
+   * @return <code>this</code> if successful.  Allows for stream mapping.
    */
-  public boolean fillFromCSV(String pCSV, IConverter<String, V> pParser) {
+  public Codex<V,E> fillFromCSV(String pCSV, IConverter<String, V> pParser) {
     String[] elements = pCSV.split(",");
     if(elements[0].equalsIgnoreCase(meta().getEnum().getSimpleName())) {
-      return false;
+      return null;
     }
     meta().setCompositeKey(Integer.parseInt(elements[1]));
     meta().overrideId(Integer.parseInt(elements[2]));
@@ -156,7 +156,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
       set(i, pParser.convert(elements[i+4]));
     }
     
-    return true;
+    return this;
   }
   
   /**

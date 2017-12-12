@@ -17,7 +17,7 @@ public class CodexElementHistory <V, E extends Enum<E> & CodexOf<V>> {
     mMaxPoints = pNumPointsToKeep;
   }
   
-  public void add(long pTime, V pDataPoint) {
+  public void add(double pTime, V pDataPoint) {
     mList.add(new CodexElementInstance<>(pTime, pDataPoint, mEnum));
     if(mList.size() > mMaxPoints) {
       mList.remove(0);
