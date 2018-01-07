@@ -145,8 +145,8 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
    */
   public Codex<V,E> fillFromCSV(String pCSV, IConverter<String, V> pParser) {
     String[] elements = pCSV.split(",");
-    if(elements[0].equalsIgnoreCase(meta().getEnum().getSimpleName())) {
-      return null;
+    if(!elements[0].equalsIgnoreCase(meta().getEnum().getSimpleName())) {
+      return this;
     }
     meta().setCompositeKey(Integer.parseInt(elements[1]));
     meta().overrideId(Integer.parseInt(elements[2]));

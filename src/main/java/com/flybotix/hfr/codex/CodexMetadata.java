@@ -67,6 +67,17 @@ public class CodexMetadata <E extends Enum<E>> {
   }
   
   /**
+   * Provides a mechanism to override ID and Time.  This is useful for associating multiple
+   * different codex types to the same ID in order to compare data across many types.
+   * @param pId ID to set
+   * @param pTime Time to override
+   */
+  public void override(int pId, double pTime) {
+	  mId = pId;
+	  setTimestamp(pTime);
+  }
+  
+  /**
    * @return the current cycle ID of the Codex.  This also matches the
    * number of times Codex.reset() has been called for this instance. 
    */
