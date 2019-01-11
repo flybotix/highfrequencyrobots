@@ -5,9 +5,7 @@
  - The following protocols are available now or are inteded to become available:
      - **UDP**
      - **TCP** (with connection retry logic)
-     - **NetworkTables Raw** (WIP-late Dec)
-         - Encodes Codexes like UDP & TCP, then sends the `byte[]` array over NT
-     - **NetworkTables By-Element**
+     - **NetworkTables By-Element** - sample Sender code is available
          - Creates 1 table per registered Codex enumeration
          - Writes the codex metadata (time, index, & composite key) to their respective fields
          - Loops through the enumeration's values and writes each to the field corresponding to enueration.name()
@@ -15,22 +13,25 @@
          - *NOTE* - of all available protocols, this is the only one that cannot handle a `null` element value
              - That simply means NetworkTables will show the 'last' good value when something goes wrong
              - The protocol will eventually have a configuration to set a default NT value of (e.g.) 0 when the codex data is `null`
-     - **Passthrough** (WIP-late Dec)
+     - **Passthrough** 
          - Uses a basic Java listener/update interface
          - Codex data stays within the same process, and does not go remote
          - Useful for writing codex data to CSV from within the same process, or using Codexes to update a display
  - Automatically compresses `null` data prior to network transmission.  This means we no longer need to fear bandwidth limitations when sending a `null` element across a network.
- - (WIP-late Dec) Includes a 1-line command to log to CSV on the Robot.
+ - Includes a 1-line command to **log to CSV** on the Robot.
  - Includes auto-incrementing metadata that keeps track of cycles for Codexes, which allows normalization of the data structure the Codex represents.
  - Includes benchmark & data integrity tests to ensure encode/decode/transit processing times are minimized.
 
 ## Get the Artifact
-The latest stable release is available at **Maven Central**:
+The latest stable release is available **via jitpack.io**, and is also available via this repository's releases tab:
 ```
-groupId: com.flybotix
-artifactId: highfrequencyrobots
-version: 2017.11.25
-Dev version: 0.0.26 (12/1)
+repositories {
+     jcenter()
+     maven { url "https://jitpack.io" }
+}
+dependencies {
+      implementation 'com.github.flybotix:highfrequencyrobots:2019.1.11'
+}
 ```
 
 ## Get Coding
@@ -94,8 +95,6 @@ Think of this array as the 'columns' of a database or spreadsheet.  Every time `
 The fact that a Codex must represent data of the same type is simultaneously this project's biggest advantage and disadvantage.  It means this project will never represent complex types (e.g. like what JSON can do), but it also means that communicating the data can be extremely efficient (unlike JSON) - and therefore be executed at a higher frequency.  In FRC robots (and many IoT scenarios), the data is all of the same type.  If the data isn't sent over a comms protocol, then the type of the codex _can_ be a String, array of arrays, complex POJOs, etc, without worry of data corruption.
 
 ## Future Work (in order)
-1. (WIP) Test threadsafe codex class, end-to-end.  Also add a thread executor to CodexSender.  Generally test multiple threads writing to codexes, and then a different thread sending the codex.
-1. (WIP) Export data to CSV with just 1 extra line of setup code
 1. Basic display using Gerrit Grunwald's horizon chart implementation
 1. Bandwidth monitoring on the client side
 1. Further characterization of NT with a live robot
