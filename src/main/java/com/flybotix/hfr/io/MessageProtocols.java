@@ -8,7 +8,6 @@ import com.flybotix.hfr.io.receiver.IReceiveProtocol;
 import com.flybotix.hfr.io.receiver.TCPReceiver;
 import com.flybotix.hfr.io.receiver.UDPReceiver;
 import com.flybotix.hfr.io.sender.ISendProtocol;
-import com.flybotix.hfr.io.sender.NTSender;
 import com.flybotix.hfr.io.sender.TCPSender;
 import com.flybotix.hfr.io.sender.UDPSender;
 
@@ -21,7 +20,7 @@ public class MessageProtocols {
   public enum EProtocol {
     TCP,
     UDP,
-    NETWORK_TABLES,
+//    NETWORK_TABLES,
     PASSHTHROUGH
   }
   
@@ -116,9 +115,9 @@ public class MessageProtocols {
       result = new UDPSender();
       result.setBatching(true);
       break;
-    case NETWORK_TABLES: 
-      result = new NTSender();
-      break;
+//    case NETWORK_TABLES: 
+//      result = new NTSender();
+//      break;
     default:
     }
 
@@ -132,8 +131,8 @@ public class MessageProtocols {
     return result;
   }
 
-  public static ISendProtocol createNTSender(String pTableName) {
-    return createSender(EProtocol.NETWORK_TABLES, -1, -1, pTableName);
-  }
+//  public static ISendProtocol createNTSender(String pTableName) {
+//    return createSender(EProtocol.NETWORK_TABLES, -1, -1, pTableName);
+//  }
   
 }
