@@ -1,7 +1,6 @@
 package com.flybotix.hfr.codex;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.TimeUnit;
 
 import com.flybotix.hfr.util.lang.EnumUtils;
 
@@ -16,6 +15,8 @@ public class CodexMetadata <E extends Enum<E>> {
   private double mTimestamp = 0;
   private Integer mKey = -1;
   private final Class<E> mEnum;
+  private ICodexTimeProvider mTimeProvider = new ICodexTimeProvider() {
+  };
   
   public String toString() {
     return mId + "\t" + mCodexTypeId + "\t" + mTimestamp + "\t" + mKey;
@@ -43,6 +44,10 @@ public class CodexMetadata <E extends Enum<E>> {
     mKey = pCompositeKey;
     mTimestamp = pTimestamp;
   }
+
+  public void overrideTimeProvider(ICodexTimeProvider pTimeProvider) {
+    mTimeProvider = pTimeProvider;
+  }
   
   public Class<E> getEnum() {
     return mEnum;
@@ -62,7 +67,7 @@ public class CodexMetadata <E extends Enum<E>> {
   public void next(boolean pUpdateTime) {
     mId++;
     if(pUpdateTime) {
-      setTimestamp(System.nanoTime());
+      setTimestamp(mTimeProvider.getTimestamp());
     }
   }
   
