@@ -53,15 +53,6 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   }
 
   /**
-   * Provides a way to override the timestamp keeper.  This allows, for example,
-   * the time to come from an FPGA rather than the Java system clock.
-   * @param pTimeProvider - basic interface that provides the time
-   */
-  public void overrideTimeProvider(ICodexTimeProvider pTimeProvider) {
-    mMeta.overrideTimeProvider(pTimeProvider);
-  }
-  
-  /**
    * Creates a Codex with the set default value and a blank metadata object
    * @param pDefaultValue Default value to set.  May be null
    * @param pEnum Enumeration backing the codex.  May NOT be null.

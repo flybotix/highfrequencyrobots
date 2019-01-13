@@ -15,7 +15,7 @@ public class CodexMetadata <E extends Enum<E>> {
   private double mTimestamp = 0;
   private Integer mKey = -1;
   private final Class<E> mEnum;
-  private ICodexTimeProvider mTimeProvider = new ICodexTimeProvider() {
+  private static ICodexTimeProvider sTIME_PROVIDER = new ICodexTimeProvider() {
   };
   
   public String toString() {
@@ -45,8 +45,8 @@ public class CodexMetadata <E extends Enum<E>> {
     mTimestamp = pTimestamp;
   }
 
-  public void overrideTimeProvider(ICodexTimeProvider pTimeProvider) {
-    mTimeProvider = pTimeProvider;
+  public static void overrideTimeProvider(ICodexTimeProvider pTimeProvider) {
+    sTIME_PROVIDER = pTimeProvider;
   }
   
   public Class<E> getEnum() {
@@ -67,7 +67,7 @@ public class CodexMetadata <E extends Enum<E>> {
   public void next(boolean pUpdateTime) {
     mId++;
     if(pUpdateTime) {
-      setTimestamp(mTimeProvider.getTimestamp());
+      setTimestamp(sTIME_PROVIDER.getTimestamp());
     }
   }
   
