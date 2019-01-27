@@ -164,7 +164,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
    */
   public void reset() {
     Arrays.fill(mData, mDefaultValue);
-    mMeta.next();
+    mMeta.next(true);
   }
   
   public String toString() {

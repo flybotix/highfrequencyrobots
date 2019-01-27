@@ -14,6 +14,7 @@ public class CodexMetadata <E extends Enum<E>> {
   private int mCodexTypeId = 0;
   private double mTimestamp = 0;
   private Integer mKey = -1;
+  private Integer mGlobalId = 0;
   private final Class<E> mEnum;
   private static ICodexTimeProvider sTIME_PROVIDER = new ICodexTimeProvider() {
   };
@@ -69,6 +70,15 @@ public class CodexMetadata <E extends Enum<E>> {
     if(pUpdateTime) {
       setTimestamp(sTIME_PROVIDER.getTimestamp());
     }
+  }
+  
+  /**
+   * Similar to pKey, this can be used to ID this codex against other codexes.
+   * @param pGlobalId
+   */
+  public CodexMetadata<E> setGlobalId(int pGlobalId) {
+    mGlobalId = pGlobalId;
+    return this;
   }
   
   /**
@@ -132,17 +142,24 @@ public class CodexMetadata <E extends Enum<E>> {
   }
   
   /**
+   * @return the global id
+   */
+  public Integer gid() {
+    return mGlobalId;
+  }
+  
+  /**
    * @return the transmitted size of the metadata
    */
   public static int sizeOf() {
-    return Integer.BYTES + Double.BYTES + Integer.BYTES; 
+    return Integer.BYTES + Double.BYTES + Integer.BYTES + Integer.BYTES; 
   }
   
   /**
    * @return a byte array that can be decoded via CodexMetadata.parse()
    */
   public byte[] encode() {
-    return ByteBuffer.allocate(sizeOf()).putInt(mId).putDouble(mTimestamp).putInt(mKey).array();
+    return ByteBuffer.allocate(sizeOf()).putInt(mId).putDouble(mTimestamp).putInt(mKey).putInt(mGlobalId).array();
   }
   
   public void setCompositeKey(int pKey) {
@@ -155,7 +172,7 @@ public class CodexMetadata <E extends Enum<E>> {
    * @return a Codex Meta data object, supposing nothing went wrong
    */
   public static <E extends Enum<E>> CodexMetadata<E> parse(Class<E> pEnum, ByteBuffer pData) {
-    return new CodexMetadata<E>(pEnum, pData.getInt(), pData.getDouble(), pData.getInt());
+    return new CodexMetadata<E>(pEnum, pData.getInt(), pData.getDouble(), pData.getInt()).setGlobalId(pData.getInt());
   }
 
   /**
