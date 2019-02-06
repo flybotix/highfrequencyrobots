@@ -1,6 +1,7 @@
 # Codex High Frequency Data Framework
 ## What it does, and why
  - The Codex is an enumeration-backed auto-normalized data structure with design considerations for an IoT-centric comms protocol.
+ - The HFD project aims to streamline IoT data into normalized data structures for use in relational databases, with the end-goal of providing large datasets to ML.
  - The library handles threading & socket comms internally, so robot code doesn't have to.  This includes batching of multiple tiny 'messages' in order to stay within the limitations of packet sizes and network rates.
  - The following protocols are available now or are inteded to become available:
      - **UDP**
