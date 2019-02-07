@@ -22,7 +22,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   protected CodexMetadata<E> mMeta;
   protected V[] mData;
   protected V mDefaultValue = null;
-  protected Class<V> mType;
+  protected final Class<V> mType;
   
   public static final CodexMagic of = CodexMagic.inst();
   public static final CodexMagic encoder = CodexMagic.inst();

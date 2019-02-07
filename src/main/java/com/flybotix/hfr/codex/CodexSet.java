@@ -1,8 +1,15 @@
 package com.flybotix.hfr.codex;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.flybotix.hfr.util.lang.EnumUtils;
+import com.sun.javafx.collections.ObservableListWrapper;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 /**
  * A codex set represents one or more linked Codex objects.  Data is set
@@ -12,50 +19,28 @@ import java.util.stream.Collectors;
  * @param <V> The type backing the codex
  * @param <E> The enumeration backing the codex
  */
-public class CodexSet <V, E extends Enum<E> & CodexOf<V>>{
-  private final Codex<V,E>[] mCodexes;
+public class CodexSet <V, E extends Enum<E> & CodexOf<V>> {
   
-  public CodexSet(Codex<V,E>[] pCodexes) {
-    mCodexes = pCodexes;
-  }
+  private final Map<E, ObservableList<V>> mData = new HashMap<>();
   
-  public void setAll(E pData, V pValue) {
-    for(int i = 0; i < mCodexes.length; i++) {
-      mCodexes[i].set(pData, pValue);
+  public CodexSet(Class<E> pEnum) {
+    for(E e : EnumUtils.getEnums(pEnum)) {
+      mData.put(e, FXCollections.observableArrayList());
     }
   }
   
-  public boolean setByIndex(int pIndex, E pData, V pValue) {
-    boolean result = false;
-    if(pIndex >= 0 && pIndex < mCodexes.length) {
-      mCodexes[pIndex].set(pData, pValue);
+  public void add(Codex<V,E> pCodex) {
+    for(E e : mData.keySet()) {
+      mData.get(e).add(pCodex.get(e));
     }
-    return result;
   }
   
-  public boolean setByKey(Integer pKey, E pData, V pValue) {
-    boolean result = false;
-    Codex<V, E> codex = find(pKey);
-    if(codex != null) {
-      codex.set(pData, pValue);
-      result = true;
-    }
-    return result;
+  public void addListener(E pEnum, ListChangeListener<V> pListener) {
+    mData.get(pEnum).addListener(pListener);
   }
   
-  private Codex<V,E> find(Integer pKey) {
-    Codex<V,E> result =
-      Arrays.stream(mCodexes)
-        .filter(c -> Objects.equals(c.meta().key(), pKey))
-        .collect(Collectors.toList())
-        .iterator()
-        .next();
-    
-//    for(int i = 0; i < mCodexes.length; i++) {
-//      if(mCodexes[i].meta().key() == pKey) {
-//        result = mCodexes[i];
-//      }
-//    }
-    return result;
+  public void removeListener(E pEnum, ListChangeListener<V> pListener) {
+    mData.get(pEnum).removeListener(pListener);
   }
+  
 }
