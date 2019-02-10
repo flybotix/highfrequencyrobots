@@ -17,35 +17,38 @@ public class Logger implements ILog {
 		LoggingControls.INST.removeListener(pListener);
 	}
 	
-	private Logger() {}
+	private final String mClassName;
+	private Logger(Class<?> pClass) {
+	  mClassName = pClass.getName();
+	}
 
 	@Override
 	public void error(Object... pOutputs) {
-		LoggingControls.INST.log(ELevel.ERROR, generateString(pOutputs));
+		LoggingControls.INST.log(ELevel.ERROR, mClassName, generateString(pOutputs));
 	}
 
 	@Override
 	public void exception(Exception pException) {
-		LoggingControls.INST.logException(pException);
+		LoggingControls.INST.logException(mClassName, pException);
 	}
 
 	@Override
 	public void debug(Object... pOutputs) {
 	  if(isEnabled(ELevel.DEBUG))
-	    LoggingControls.INST.log(ELevel.DEBUG, generateString(pOutputs));
+	    LoggingControls.INST.log(ELevel.DEBUG, mClassName,  generateString(pOutputs));
 	}
 
 	@Override
 	public void info(Object... pOutputs) {
     if(isEnabled(ELevel.INFO))
-		LoggingControls.INST.log(ELevel.INFO, generateString(pOutputs));
+		LoggingControls.INST.log(ELevel.INFO, mClassName,  generateString(pOutputs));
 
 	}
 
 	@Override
 	public void warn(Object... pOutputs) {
     if(isEnabled(ELevel.WARN))
-		LoggingControls.INST.log(ELevel.WARN, generateString(pOutputs));
+		LoggingControls.INST.log(ELevel.WARN, mClassName,  generateString(pOutputs));
 
 	}
 	
@@ -56,7 +59,7 @@ public class Logger implements ILog {
 	public static ILog createLog(Class<?> pClass) {
 		ILog result = sDEBUGS.get(pClass);
 		if (result == null) {
-			result = new Logger();
+			result = new Logger(pClass);
 			sDEBUGS.put(pClass, result);
 		}
 		return result;

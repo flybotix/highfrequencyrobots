@@ -40,41 +40,42 @@ class LoggingControls extends Delegator<LogOutput>{
 	  return pLevel.ordinal() >= mLevel.ordinal();
 	}
 
-	void log(ELevel pLevel, String pText) {
+	void log(ELevel pLevel, String pClassName, String pText) {
 	  if(isLevelEnabled(pLevel)) {
   		LogOutput output = new LogOutput(
   				System.currentTimeMillis(), 
   				pLevel, 
-  				pText, 
+  				pText,
   				Thread.currentThread().getName(), 
-  				getCurrentThreadClassName());
+  				pLevel == ELevel.ERROR ? getCurrentThreadClassName() : pClassName
+			);
   		update(output);
 	  }
 	}
 	
-	void logException(Exception pException)
+	void logException(String pClass, Exception pException)
 	{
 	  try {
-	    log(ELevel.ERROR, format(pException));
+	    log(ELevel.ERROR, pClass, format(pException));
 	  } catch (Throwable t) {
 	    t.printStackTrace();
 	  }
 	}
 
-	void printStackTrace(ELevel pLevel, String... pNotes) {
-		printStackTrace(pLevel, -1L, pNotes);
+	void printStackTrace(ELevel pLevel, String pClass, String... pNotes) {
+		printStackTrace(pLevel, pClass, -1L, pNotes);
 	}
 	
-	void printStackTrace(ELevel pLevel, StackTraceElement[] pElements)
+	void printStackTrace(ELevel pLevel, String pClass, StackTraceElement[] pElements)
 	{
-		printStackTrace(pLevel, -1L, pElements, new String[0]);
+		printStackTrace(pLevel, pClass, -1L, pElements, new String[0]);
 	}
 	
 	void setOutputLevel(ELevel pLevel) {
 	  mLevel  = pLevel;
 	}
 
-	void printStackTrace(ELevel pLevel, long delay,
+	void printStackTrace(ELevel pLevel, String pClass, long delay,
 			StackTraceElement[] pElements, String... pNotes) {
 		StringBuilder sb = new StringBuilder();
 		// sb.append("\n******************** ").append(
@@ -101,13 +102,13 @@ class LoggingControls extends Delegator<LogOutput>{
 			sb.append("\nCall took ").append(delay).append("ms!\n");
 		}
 		sb.append("******************************************************\n");
-		log(pLevel, sb.toString());
+		log(pLevel, pClass, sb.toString());
 
 	}
 
-	void printStackTrace(ELevel pLevel, long delay, String... pNotes) {
+	void printStackTrace(ELevel pLevel, String pClass, long delay, String... pNotes) {
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-		printStackTrace(pLevel, delay, elements, pNotes);
+		printStackTrace(pLevel, pClass, delay, elements, pNotes);
 	}
 
 	void setStackTraceLength(int pLength) {

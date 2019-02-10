@@ -13,18 +13,23 @@ plugins {
   id "java"
   id "eclipse"
   id "idea"
+  id 'org.openjfx.javafxplugin' version '0.0.7'
 }
 
 apply plugin: 'eclipse'
 apply plugin: 'java'
 apply plugin: 'maven'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
 
 repositories {
-  mavenCentral() // tilesFX & Medusa (gauges)
-  jcenter() // fontawesomeFX
+  mavenCentral()
+  jcenter()
+}
+
+javafx {
+    modules = [ 'javafx.controls']
 }
 
 dependencies {
