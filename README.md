@@ -54,13 +54,13 @@ public enum RobotData implements CodexOf<Double>{
 // 172.22.11.1 is the default IP of the driver's station when connected over USB
 // For a live field, it is recommended to set the driver's station to a static IP, such as '10.18.85.10'.
 // See https://wpilib.screenstepslive.com/s/4485/m/24193/l/319135-ip-networking-at-the-event
-ISendProtocol protocol = Protocols.createSender(EProtocol.UDP, 7778, 7777, "172.22.11.1");
+ISendProtocol protocol = MessageProtocols.createSender(EProtocol.UDP, 7778, 7777, "172.22.11.1");
 CodexSender sender = new CodexSender(protocol);
 ```
 3. On the laptop/client side, create a 'receiver'.  Then register for updates with that receiver.
 ```java
 // Re-use this protocol for all of the receivers
-IReceiveProtocol protocol = Protocols.createReceiver(EProtocol.UDP, 7778, null);
+IReceiveProtocol protocol = MessageProtocols.createReceiver(EProtocol.UDP, 7778, null);
 // A CodexReceiver registers with the protocol and parses ETestData messages received over that protocol
 CodexReceiver<Double, ETestData> receiver = new CodexReceiver<>(ETestData.class, protocol);
 //When a new ETestData message is received, this prints it to the console.
