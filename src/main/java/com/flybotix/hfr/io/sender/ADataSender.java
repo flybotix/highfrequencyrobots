@@ -21,13 +21,11 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
   private final MessageQueue mBatchQ = new MessageQueue();
   protected int mDestPort;
   protected int mHostPort;
-  //TODO - a bit of a temporary hack to keep both.  Just preserving functionality through refactoring
   protected String mDestAddress;
-  protected String[] mDestAddresses;
   protected final ConnectionStatus mStatus = new ConnectionStatus();
   protected boolean mIsBatching = false;
   private boolean mIsRegisteredWithShutdown = false;
-  
+
   private final Timer mBatchTimer = new Timer("Batch Writer");
   private TimerTask mBatchTask = null;
 
@@ -44,17 +42,12 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
     mDestPort = pPort;
     reconnectIfLive();
   }
-  
-  @Override
-  public void setDestAddress(String... pAddress) {
-    if(pAddress != null && pAddress.length == 1) {
-      mDestAddress = pAddress[0];
-    } else {
-      mDestAddresses = pAddress;
-    }
+
+  public void setDestAddress(String pAddress) {
+    mDestAddress = pAddress;
     reconnectIfLive();
   }
-  
+
   @Override
   public void setBatching(boolean pUseBatching) {
     mIsBatching = pUseBatching;
@@ -69,9 +62,8 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
       }
     }
   }
-  
+
   protected abstract void establishConnection(InetAddress addr);
-  protected abstract void establishConnection(InetAddress... addrs);
   protected abstract void establishConnection(String addr);
   protected abstract boolean usesNetAddress();
 
@@ -82,32 +74,13 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
       if(!usesNetAddress()) {
         establishConnection(mDestAddress);
       } else {
-          if(mDestAddress != null) {
-            try {
-              InetAddress addr = InetAddress.getByName(mDestAddress);
-              establishConnection(addr);
-            } catch (UnknownHostException e) {
-              update(mStatus.errorDuringAttempt());
-              mLog.error(e.getMessage());
-            }
-          } else {
-            InetAddress[] addrs = new InetAddress[mDestAddresses.length];
-            boolean anyFound = false;
-            for(int i = 0; i < mDestAddresses.length; i++) {
-              try {
-                addrs[i] = InetAddress.getByName(mDestAddresses[i]);
-                anyFound = true;
-              } catch (UnknownHostException e) {
-                mLog.warn("Unknown Host - ", mDestAddresses[i], "\t",e.getMessage());
-              }
-            }
-            if(anyFound) {
-              establishConnection(addrs);
-            } else {
-              mLog.error("Unable to find any hosts.  Cancelling connection request.");
-              update(mStatus.errorDuringAttempt());
-            }
-          }
+        try {
+          InetAddress addr = InetAddress.getByName(mDestAddress);
+          establishConnection(addr);
+        } catch (UnknownHostException e) {
+          update(mStatus.errorDuringAttempt());
+          mLog.error(e.getMessage());
+        }
       }
       if(!mIsRegisteredWithShutdown) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnect()));
@@ -141,14 +114,14 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
       mLog.exception(e);
     }
   }
-  
+
   private void reconnectIfLive() {
     if(mStatus.isConnected() || mStatus.isAttempting()) {
       disconnect();
       connect();
     }
   }
-  
+
   private final class BatchTask extends TimerTask {
     private final MessageQueue batch;
     private final MessageQueue send;
@@ -156,7 +129,7 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
       batch = pBatchQueue;
       send = pSendQueue;
     }
-    
+
     @Override
     public boolean cancel() {
       try {
@@ -170,7 +143,7 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
       }
       return super.cancel();
     }
-    
+
     @Override
     public void run() {
       try {
@@ -201,6 +174,6 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
         // Not a big deal - this task will re-run at a fixed rate
       }
     }
-    
+
   }
 }

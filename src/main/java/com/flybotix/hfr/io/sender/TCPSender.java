@@ -21,7 +21,7 @@ public class TCPSender extends ADataSender {
   protected Socket mClientSocket;
   protected Semaphore mSocketLock = new Semaphore(1, true);
   private DataOutputStream writer = null;
-  
+
   private final Executor mThreads = Executors.newFixedThreadPool(2);
 
   private ILog mLog = Logger.createLog(TCPSender.class);
@@ -30,17 +30,12 @@ public class TCPSender extends ADataSender {
   protected boolean usesNetAddress() {
     return true;
   }
-  
+
   @Override
   protected void establishConnection(String addr) {
     // Not used
   }
 
-  @Override
-  protected void establishConnection(InetAddress... addr) {
-    // TODO
-  }
-  
   @Override
   protected void establishConnection(InetAddress addr) {
     mThreads.execute(() -> {
@@ -50,7 +45,7 @@ public class TCPSender extends ADataSender {
           mLog.debug("Inet Addr:" + addr);
           mClientSocket = new Socket(addr, mDestPort);
           mLog.debug("Client Established");
-    
+
           mLog.debug("Attempting to find Output Stream");
           try {
             OutputStream output = mClientSocket.getOutputStream();
@@ -58,7 +53,7 @@ public class TCPSender extends ADataSender {
             mLog.info("Data Output Stream Found");
           } catch (IOException e) {
             e.printStackTrace();
-          } 
+          }
           update(mStatus.connectionEstablished());
           startReadTask();
         } catch (ConnectException ce) {

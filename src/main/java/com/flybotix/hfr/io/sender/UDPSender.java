@@ -16,7 +16,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
 public class UDPSender extends ADataSender{
-  
+
   private final Executor mThreads = Executors.newFixedThreadPool(1);
   private DatagramSocket socket = null;
 
@@ -26,27 +26,10 @@ public class UDPSender extends ADataSender{
   protected boolean usesNetAddress() {
     return true;
   }
-  
+
   @Override
   protected void establishConnection(String addr) {
     // Not used
-  }
-
-  @Override
-  protected void establishConnection(InetAddress... addr) {
-    for(InetAddress address : addr) {
-      if(address != null) {
-        try {
-          boolean reachable = address.isReachable(2000);
-          if(reachable) {
-            establishConnection(address);
-            break;
-          }
-        } catch (IOException e) {
-          mLog.exception(e);
-        }
-      }
-    }
   }
 
   @Override
