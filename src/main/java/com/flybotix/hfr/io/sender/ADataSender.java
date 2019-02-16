@@ -165,8 +165,8 @@ public abstract class ADataSender extends Delegator<ConnectionStatus> implements
           for(ByteBuffer bb : buffersToSend) {
             msg.put(bb.array());
           }
-          if(Logger.isEnabled(ELevel.INFO)) {
-            mLog.info("Sending batched message of size " + msgSize + " with batch header size of " + 3*Integer.BYTES);
+          if(Logger.isEnabled(ELevel.DEBUG)) {
+            mLog.debug("Sending batched message of size " + msgSize + " with batch header size of " + 3*Integer.BYTES);
           }
           send.add(msg);
         }
