@@ -80,7 +80,7 @@ data.put(RobotData.gyro, mxp.getGyroRelative());
 double degrees = data.get(RobotData.gyro);
 
 // Send the data back to the laptop at the end of each cycle
-sender.send(data);
+sender.sendIfChanged(data);
 ```
 
 ## The Codex: an enumerated array

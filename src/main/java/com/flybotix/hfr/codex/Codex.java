@@ -23,6 +23,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   protected V[] mData;
   protected V mDefaultValue = null;
   protected final Class<V> mType;
+  protected boolean mHasChanged = false;
   
   public static final CodexMagic of = CodexMagic.inst();
   public static final CodexMagic encoder = CodexMagic.inst();
@@ -165,6 +166,15 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
   public void reset() {
     Arrays.fill(mData, mDefaultValue);
     mMeta.next(true);
+    mHasChanged = false;
+  }
+
+  /**
+   * @return whether or not any data in this codex has been set (via <code>set()</code>)
+   * since the last time <code>reset()</code> was called.
+   */
+  public boolean hasChanged() {
+    return mHasChanged;
   }
   
   public String toString() {
@@ -217,6 +227,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
    * @param pValue The value of the data
    */
   public void set(int pOrdinal, V pValue) {
+    mHasChanged = true;
     mData[pOrdinal] = pValue;
   }
 

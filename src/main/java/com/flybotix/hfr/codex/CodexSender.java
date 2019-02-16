@@ -54,6 +54,20 @@ public class CodexSender {
       mSender = MessageProtocols.createSender(pType, pHostPort, pDestPort, pDestAddr);
     }
   }
+
+  /**
+   * Sends a codex using the previously-defined connection info, but ONLY if hasChanged() returns true.  This is the
+   * recommended send() method.
+   * @param pData The codex to send
+   * @throws IllegalStateException If the connection has not been initialized
+   * @param <V> The type backing the codex
+   * @param <E> The enumeration backing the codex
+   */
+  public <V, E extends Enum<E> & CodexOf<V>> void sendIfChanged(Codex<V, E> pData) throws IllegalStateException{
+    if(pData.hasChanged()) {
+      send(pData);
+    }
+  }
   
   /**
    * Sends a codex using the previously-defined connection info.
