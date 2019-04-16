@@ -113,6 +113,7 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     for(E e : set) {
       sb.append(e.toString().replaceAll("_", " ")).append(',');
     }
+    sb.substring(0, sb.length() - 1);
     return sb.toString();
   }
   
@@ -133,9 +134,10 @@ public class Codex <V, E extends Enum<E> & CodexOf<V>>{
     sb.append(meta().key()).append(',');
     sb.append(meta().id()).append(',');
     sb.append(meta().timestamp()).append(',');
-    for(int i = 0; i < mData.length; i++) {
+    for(int i = 0; i < mData.length - 1; i++) {
       sb.append(pToString.convert(mData[i])).append(',');
     }
+    sb.append(pToString.convert(mData[mData.length - 1]));
     return sb.toString();
   }
   
