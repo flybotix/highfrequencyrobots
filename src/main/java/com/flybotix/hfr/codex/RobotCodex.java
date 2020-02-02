@@ -1,0 +1,294 @@
+package com.flybotix.hfr.codex;
+
+import com.flybotix.hfr.util.lang.EnumUtils;
+
+import java.util.Arrays;
+import java.util.EnumSet;
+
+public class RobotCodex <E extends Enum<E>> {
+    private final static String NAN = Double.toString(Double.NaN);
+    protected CodexMetadata<E> mMeta;
+    protected double[] mData;
+    protected double mDefaultValue = Double.NaN;
+    protected boolean mHasChanged = false;
+
+    /**
+     * Creates a new Codex with the set metadata and default value
+     * @param pDefaultValue
+     * @param pMeta
+     */
+    public RobotCodex(double pDefaultValue, CodexMetadata<E> pMeta) {
+        mMeta = pMeta;
+        mDefaultValue = pDefaultValue;
+        mData = new double[EnumUtils.getLength(pMeta.getEnum())];
+        Arrays.fill(mData, mDefaultValue);
+    }
+
+    /**
+     * Creates a Codex with the set default value and a blank metadata object
+     * @param pDefaultValue Default value to set.  May be null
+     * @param pEnum Enumeration backing the codex.  May NOT be null.
+     */
+    public RobotCodex(double pDefaultValue, Class<E> pEnum) {
+        this(pDefaultValue, CodexMetadata.empty(pEnum));
+    }
+
+    /**
+     * Creates a Codex with <code>null</code> as the default value
+     * @param pEnum Enumeration backing the codex.  May NOT be null.
+     */
+    public RobotCodex(Class<E> pEnum) {
+        this(Double.NaN, pEnum);
+    }
+
+    /**
+     * @return the metadata
+     */
+    public CodexMetadata<E> meta() {
+        return mMeta;
+    }
+
+    /**
+     * Overrides the metadata
+     * @param pMeta The new metadata
+     */
+    public void setMetadata(CodexMetadata<E> pMeta) {
+        mMeta = pMeta;
+    }
+
+    /**
+     * @return (effectively) this is E.values().length
+     */
+    public int length() {
+        return mData.length;
+    }
+
+    public String getCSVHeader() {
+        EnumSet<E> set = EnumSet.allOf(meta().getEnum());
+        StringBuilder sb = new StringBuilder();
+        sb.append("Codex Name").append(',');
+        sb.append("Key").append(',');
+        sb.append("Id").append(',');
+        sb.append("Time ").append("(s)").append(',');
+        for(E e : set) {
+            sb.append(e.toString().replaceAll("_", " ")).append(',');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * @return A CSV string that represents this instance of the Codex, including metadata
+     */
+    public String toCSV() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(meta().getEnum().getSimpleName()).append(',');
+        sb.append(meta().key()).append(',');
+        sb.append(meta().id()).append(',');
+        sb.append(meta().timestamp()).append(',');
+        for(int i = 0; i < mData.length; i++) {
+            sb.append(mData[i]).append(',');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * @param pCSV String to parse
+     * @return <code>this</code> if successful.  Allows for stream mapping.
+     */
+    public RobotCodex<E> fillFromCSV(String pCSV) {
+        String[] elements = pCSV.split(",");
+        if(!elements[0].equalsIgnoreCase(meta().getEnum().getSimpleName())) {
+            return this;
+        }
+        meta().setCompositeKey(Integer.parseInt(elements[1]));
+        meta().overrideId(Integer.parseInt(elements[2]));
+        meta().setTimestamp(Double.parseDouble(elements[3]));
+
+        for(int i = 0; i < length(); i++) {
+            if(elements[i+4].equals(NAN)) {
+                set(i, Double.NaN);
+            } else {
+                set(i, Double.parseDouble(elements[i+4]));
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Resets the data to the default value (which is usually <code>null</code>
+     */
+    public void reset() {
+        Arrays.fill(mData, mDefaultValue);
+        mMeta.next(true);
+        mHasChanged = false;
+    }
+
+    /**
+     * @return whether or not any data in this codex has been set (via <code>set()</code>)
+     * since the last time <code>reset()</code> was called.
+     */
+    public boolean hasChanged() {
+        return mHasChanged;
+    }
+
+    public String toString() {
+        if(mData == null) return "null";
+        return Arrays.toString(mData);
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object pOther) {
+        RobotCodex<E> o = (RobotCodex<E>)pOther;
+        return Arrays.equals(o.mData, mData);
+    }
+
+    /**
+     * Returns an enumeration element based upon the input enum class. This is useful in cases where the numerical
+     * robot data must be mixed with state-related (enumerated) data for a subsysytem. This is pretty common in FRC.
+     * @param pEnum The enumeration that represents a set of states
+     * @param pData The element of this codex which represents a state
+     * @param <T> The enumeration Type parameter
+     * @return the enumeration, typed to T
+     */
+    public <T extends Enum<T>> T get(E pData, Class<T> pEnum) {
+        return get(pData.ordinal(), pEnum);
+    }
+
+    /**
+     * Useful for looping functionss
+     * @return the value in the array at the ordinal
+     * @param pOrdinal The index/ordinal to get
+     */
+    public <T extends Enum<T>> T get(int pOrdinal, Class<T> pEnum) {
+        if(isSet(pOrdinal)) {
+            return EnumUtils.getEnums(pEnum, true).get((int) get(pOrdinal));
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Useful for looping functionss
+     * @return the value in the array at the ordinal
+     * @param pOrdinal The index/ordinal to get
+     */
+    public double get(int pOrdinal) {
+        return mData[pOrdinal];
+    }
+
+    /**
+     * @return the value in the array at the location of the enum's ordinal
+     * @param pData The data piece to get
+     */
+    public double get(E pData) {
+        return get(pData.ordinal());
+    }
+
+    /**
+     * Utility method to handle flags in a robot context. Sets a value to 1.0 if pValue == true, else 0.0
+     * @param pData  the data to set
+     * @param pValue true/false flag to set
+     */
+    public void set(E pData, boolean pValue) {
+        set(pData.ordinal(), pValue);
+    }
+
+    /**
+     * Utility method to handle flags in a robot context. Sets a value to 1.0 if pValue == true, else 0.0
+     * @param pOrdinal  the data to set
+     * @param pValue true/false flag to set
+     */
+    public void set(int pOrdinal, boolean pValue) {
+        if(pValue) {
+            set(pOrdinal,1.0);
+        } else {
+            set(pOrdinal,0.0);
+        }
+    }
+
+    /**
+     * Set some data.
+     * @param pData The data to set
+     * @param pValue The value of the data
+     */
+    public void set(E pData, double pValue) {
+        set(pData.ordinal(), pValue);
+    }
+
+    /**
+     * Set some data via a cached (or looped) index/ordinal
+     * @param pOrdinal The index of the data (matches E.ordinal())
+     * @param pValue The value of the data
+     */
+    public void set(int pOrdinal, double pValue) {
+        mHasChanged = true;
+        mData[pOrdinal] = pValue;
+    }
+
+    /**
+     * Set some data that represents an enumerated state
+     * @param pData The data to set
+     * @param pState The state value
+     * @param <T> The enumeration / set of states
+     */
+    public <T extends Enum<T>> void set(E pData, T pState) {
+        set(pData, (double)pState.ordinal());
+    }
+
+    /**
+     * This seemingly-useless method helps reduce boilerplate.  It also adds a way to hack booleans/flags into a codex of non-booleans.
+     * @param pOrdinal Value to check
+     * @return whether the value at the enum's location is not null and does not equal the codex's default value.
+     */
+    public boolean isSet(int pOrdinal) {
+        return !isNull(pOrdinal);
+    }
+
+
+    /**
+     * This seemingly-useless method helps reduce boilerplate.  It also adds a way to hack booleans/flags into a codex of non-booleans.
+     * @param pOrdinal Value to check
+     * @return whether the value at the enum's location is null or equals the codex's default value.
+     */
+    public boolean isNull(int pOrdinal) {
+        return mData[pOrdinal] == Double.NaN || mData[pOrdinal] == mDefaultValue;
+    }
+
+    /**
+     * This seemingly-useless method helps reduce boilerplate.  It also adds a way to hack booleans/flags into a codex of non-booleans.
+     * @param pEnum Value to check
+     * @return whether the value at the enum's location is not null and does not equal the codex's default value.
+     */
+    public boolean isSet(E pEnum) {
+        return isSet(pEnum.ordinal());
+    }
+
+
+    /**
+     * This seemingly-useless method helps reduce boilerplate.  It also adds a way to hack booleans/flags into a codex of non-booleans.
+     * @param pEnum Value to check
+     * @return whether the value at the enum's location is null or equals the codex's default value.
+     */
+    public boolean isNull(E pEnum) {
+        return isNull(pEnum.ordinal());
+    }
+
+    /**
+     * @return a hash based upon set values.
+     */
+    public CodexHash hash() {
+        CodexHash codex = new CodexHash();
+        for(int i = 0; i < mData.length; i++) {
+            if(get(i) != Double.NaN) {
+                codex.bs.set(i);
+                codex.nonNullCount++;
+            }
+        }
+
+        // Set this bit so the BitSet length matches the enumeration length
+        codex.bs.set(mData.length);
+        return codex;
+    }
+
+}
