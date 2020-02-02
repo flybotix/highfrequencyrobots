@@ -92,6 +92,21 @@ public class RobotCodex <E extends Enum<E>> {
     }
 
     /**
+     * @return a VERY verbose csv string with each enum element name prefixing each codex value. DO NOT call this at
+     * a high frequency! This is best used for unit testing.
+     */
+    public String toVerboseString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("KEY="+mMeta.key()).append(", ");
+        sb.append("ID="+mMeta.id()).append(", ");
+        sb.append("TIME="+mMeta.timestamp()).append(", ");
+        for(E e : EnumUtils.getSortedEnums(mMeta.getEnum())) {
+            sb.append(e.name()).append("=").append(get(e)).append(", ");
+        }
+        return sb.toString();
+    }
+
+    /**
      * @param pCSV String to parse
      * @return <code>this</code> if successful.  Allows for stream mapping.
      */
