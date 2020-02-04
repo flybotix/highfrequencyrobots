@@ -55,9 +55,10 @@ public class TestClientReceiver implements TestConfig{
     }
     
     private void report() {
-      System.out.println("Rate (msgs/sec): " + (mCount / mPeriod) 
+      System.out.println("Rate (msgs/sec): " + (mCount / mPeriod)
         + "\t# of Fields: " + mLength 
-        + "\tBandwidth (Megabits/sec): " + df.format(mSize/mPeriod/1024d/1024d*8));
+        + "\tBandwidth (Megabits/sec): " + df.format(mSize/mPeriod/1024d/1024d*8)
+        + "\tFree Memory (MB): " + Runtime.getRuntime().freeMemory()/1024/1024);
     }
   }
 }

@@ -306,4 +306,18 @@ public class RobotCodex <E extends Enum<E>> {
         return codex;
     }
 
+    /**
+     * @return a copy of this RobotCodex. The copy should be identical such that RobotCodex.equals() == true
+     *  AND RobotMetadata.equals() == true.
+     */
+    public RobotCodex<E> copy() {
+        RobotCodex<E> result = new RobotCodex<>(mMeta.getEnum());
+        for(int i = 0; i < mData.length; i++) {
+            result.set(i, mData[i]);
+        }
+        result.mMeta.setCompositeKey(mMeta.key());
+        result.mMeta.setGlobalId(mMeta.gid());
+        result.mMeta.setTimestamp(mMeta.timestamp());
+        return result;
+    }
 }
