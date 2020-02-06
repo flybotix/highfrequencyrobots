@@ -1,6 +1,7 @@
 package com.flybotix.hfr.codex;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import com.flybotix.hfr.util.lang.EnumUtils;
 
@@ -18,6 +19,7 @@ public class CodexMetadata <E extends Enum<E>> {
   private final Class<E> mEnum;
   private static ICodexTimeProvider sTIME_PROVIDER = new ICodexTimeProvider() {
   };
+  private final List<E> mEnumList;
   
   public String toString() {
     return mId + "\t" + mCodexTypeId + "\t" + mTimestamp + "\t" + mKey;
@@ -44,6 +46,7 @@ public class CodexMetadata <E extends Enum<E>> {
     mId = pId;
     mKey = pCompositeKey;
     mTimestamp = pTimestamp;
+    mEnumList = EnumUtils.getSortedEnums(pType);
   }
 
   public static void overrideTimeProvider(ICodexTimeProvider pTimeProvider) {
@@ -165,6 +168,11 @@ public class CodexMetadata <E extends Enum<E>> {
   public void setCompositeKey(int pKey) {
     mKey = pKey;
   }
+
+  /**
+   * @return a sorted list of the enumeration elements
+   */
+  public List<E> enums() {return mEnumList;}
   
   /**
    * @param pEnum The enum that backs the Codex.
