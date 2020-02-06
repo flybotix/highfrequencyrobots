@@ -1,4 +1,6 @@
 # Codex High Frequency Data Framework
+Latest version: `2020.2.6b`
+
 ## What it does, and why
  - The Codex is an enumeration-backed auto-normalized data structure with design considerations for an IoT-centric comms protocol.
  - The RobotCodex is a specialized version of Codex which has a (primitive) double array. 
@@ -24,7 +26,7 @@ repositories {
      maven { url "https://jitpack.io" }
 }
 dependencies {
-      implementation 'com.github.flybotix:highfrequencyrobots:2020.2.6a'
+      implementation 'com.github.flybotix:highfrequencyrobots:2020.2.6b'
 }
 ```
 
