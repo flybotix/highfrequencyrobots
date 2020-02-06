@@ -86,7 +86,11 @@ public class RobotCodex <E extends Enum<E>> {
         sb.append(meta().id()).append(',');
         sb.append(meta().timestamp()).append(',');
         for(int i = 0; i < mData.length; i++) {
-            sb.append(mData[i]).append(',');
+            if(isSet(i)) {
+                sb.append(mData[i]).append(',');
+            } else {
+                sb.append(',');
+            }
         }
         return sb.toString();
     }
@@ -267,7 +271,7 @@ public class RobotCodex <E extends Enum<E>> {
      * @return whether the value at the enum's location is null or equals the codex's default value.
      */
     public boolean isNull(int pOrdinal) {
-        return mData[pOrdinal] == Double.NaN || mData[pOrdinal] == mDefaultValue;
+        return Double.isNaN(mData[pOrdinal]) || mData[pOrdinal] == mDefaultValue;
     }
 
     /**
