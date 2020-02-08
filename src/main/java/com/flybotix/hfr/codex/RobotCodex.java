@@ -205,7 +205,8 @@ public class RobotCodex <E extends Enum<E>> {
     }
 
     /**
-     * Utility method to handle flags in a robot context. Sets a value to 1.0 if pValue == true, else 0.0
+     * Utility method to handle flags in a robot context. Sets a value to 1.0 if pValue == true, else the DEFAULT value (Double.NaN, etc)
+     * If isSet() is called for this enumeration element, then that call will return TRUE if and only iff pValue is TRUE.
      * @param pData  the data to set
      * @param pValue true/false flag to set
      */
@@ -214,7 +215,8 @@ public class RobotCodex <E extends Enum<E>> {
     }
 
     /**
-     * Utility method to handle flags in a robot context. Sets a value to 1.0 if pValue == true, else 0.0
+     * Utility method to handle flags in a robot context. Sets a value to 1.0 if pValue == true, else the DEFAULT value (Double.NaN, etc)
+     * If isSet() is called for this enumeration element, then that call will return TRUE if and only iff pValue is TRUE.
      * @param pOrdinal  the data to set
      * @param pValue true/false flag to set
      */
@@ -222,7 +224,7 @@ public class RobotCodex <E extends Enum<E>> {
         if(pValue) {
             set(pOrdinal,1.0);
         } else {
-            set(pOrdinal,0.0);
+            set(pOrdinal,mDefaultValue);
         }
     }
 

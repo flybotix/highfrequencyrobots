@@ -1,5 +1,5 @@
 # Codex High Frequency Data Framework
-Latest version: `2020.2.6b`
+Latest version: `2020.2.8`
 
 ## What it does, and why
  - The Codex is an enumeration-backed auto-normalized data structure with design considerations for an IoT-centric comms protocol.
@@ -85,3 +85,8 @@ The fact that a Codex must represent data of the same type is simultaneously thi
 1. Further characterization of NT with a live robot
 1. End-to-end test TCP protocol with a live robot
 1. Heuristics & warnings about limting quantities of fields, compression vs non-compression, etc.
+
+
+## Change Log
+2020.2.8
+ - Made `RobotCodex::set(pEnum, boolean)` consistent with `RobotCodex.isSet(pEnum)` for the boolean element
