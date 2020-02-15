@@ -2,10 +2,13 @@ package com.flybotix.hfr.codex;
 
 import com.flybotix.hfr.util.lang.EnumUtils;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.EnumSet;
 
 public class RobotCodex <E extends Enum<E>> {
+    public static NumberFormat sGLOBAL_CSV_FORMAT = new DecimalFormat("0.00000");
     private final static String NAN = Double.toString(Double.NaN);
     protected CodexMetadata<E> mMeta;
     protected double[] mData;
@@ -72,6 +75,26 @@ public class RobotCodex <E extends Enum<E>> {
         sb.append("Time ").append("(s)").append(',');
         for(E e : set) {
             sb.append(e.toString().replaceAll("_", " ")).append(',');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * @return A CSV string that represents this instance of the Codex, including metadata; formatted using the global
+     *  number format
+     */
+    public String toFormattedCSV() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(meta().getEnum().getSimpleName()).append(',');
+        sb.append(meta().key()).append(',');
+        sb.append(meta().id()).append(',');
+        sb.append(sGLOBAL_CSV_FORMAT.format(meta().timestamp())).append(',');
+        for(int i = 0; i < mData.length; i++) {
+            if(isSet(i)) {
+                sb.append(sGLOBAL_CSV_FORMAT.format(mData[i])).append(',');
+            } else {
+                sb.append(',');
+            }
         }
         return sb.toString();
     }
