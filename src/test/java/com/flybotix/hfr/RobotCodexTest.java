@@ -17,4 +17,55 @@ public class RobotCodexTest {
         }
         Assert.assertEquals(rc, rc.copy());
     }
+
+    @org.junit.Test
+    public void RobotCodexNaN() {
+        RobotCodex<Test> rc = new RobotCodex<>(Double.NaN, Test.class);
+        rc.reset();
+        rc.set(Test.A, Math.random());
+        Assert.assertTrue(rc.isSet(Test.A));
+        Assert.assertFalse(rc.isNull(Test.A));
+
+        rc.set(Test.B, 0.0);
+        Assert.assertTrue(rc.isSet(Test.B));
+        Assert.assertFalse(rc.isNull(Test.B));
+
+        rc.set(Test.C, Double.NaN);
+        Assert.assertFalse(rc.isSet(Test.C));
+        Assert.assertTrue(rc.isNull(Test.C));
+        Assert.assertEquals("Safe get 0.0 test", rc.safeGet(Test.C, 0.0), 0.0, 0.000001);
+
+        // Technically these are "set"... except they aren't values. So we expect them to return "not set"
+        rc.set(Test.D, Double.NEGATIVE_INFINITY);
+        Assert.assertFalse(rc.isSet(Test.D));
+        Assert.assertTrue(rc.isNull(Test.D));
+
+        rc.set(Test.E, Double.NEGATIVE_INFINITY);
+        Assert.assertFalse(rc.isSet(Test.E));
+        Assert.assertTrue(rc.isNull(Test.E));
+
+        rc = new RobotCodex<>(0.0, Test.class);
+        rc.reset();
+        rc.set(Test.A, Math.random());
+        Assert.assertTrue(rc.isSet(Test.A));
+        Assert.assertFalse(rc.isNull(Test.A));
+
+        rc.set(Test.B, 0.0);
+        Assert.assertFalse(rc.isSet(Test.B));
+        Assert.assertTrue(rc.isNull(Test.B));
+
+        rc.set(Test.C, Double.NaN);
+        Assert.assertFalse(rc.isSet(Test.C));
+        Assert.assertTrue(rc.isNull(Test.C));
+        Assert.assertEquals("Safe get 0.0 test", rc.safeGet(Test.C, 0.0), 0.0, 0.000001);
+
+        // Technically these are "set"... except they aren't values. So we expect them to return "not set"
+        rc.set(Test.D, Double.NEGATIVE_INFINITY);
+        Assert.assertFalse(rc.isSet(Test.D));
+        Assert.assertTrue(rc.isNull(Test.D));
+
+        rc.set(Test.E, Double.NEGATIVE_INFINITY);
+        Assert.assertFalse(rc.isSet(Test.E));
+        Assert.assertTrue(rc.isNull(Test.E));
+    }
 }
