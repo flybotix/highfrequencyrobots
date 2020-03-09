@@ -37,7 +37,7 @@ public class RobotCodex <E extends Enum<E>> {
     }
 
     /**
-     * Creates a Codex with <code>null</code> as the default value
+     * Creates a Codex with <code>NaN</code> as the default value
      * @param pEnum Enumeration backing the codex.  May NOT be null.
      */
     public RobotCodex(Class<E> pEnum) {
@@ -66,6 +66,9 @@ public class RobotCodex <E extends Enum<E>> {
         return mData.length;
     }
 
+    /**
+     * @return a string representing the CSV header. Includes metadata as the first few columns.
+     */
     public String getCSVHeader() {
         EnumSet<E> set = EnumSet.allOf(meta().getEnum());
         StringBuilder sb = new StringBuilder();
@@ -368,7 +371,7 @@ public class RobotCodex <E extends Enum<E>> {
     public CodexHash hash() {
         CodexHash codex = new CodexHash();
         for(int i = 0; i < mData.length; i++) {
-            if(get(i) != Double.NaN) {
+            if(isSet(i)) {
                 codex.bs.set(i);
                 codex.nonNullCount++;
             }
@@ -386,7 +389,7 @@ public class RobotCodex <E extends Enum<E>> {
     public RobotCodex<E> copy() {
         RobotCodex<E> result = new RobotCodex<>(mMeta.getEnum());
         for(int i = 0; i < mData.length; i++) {
-            result.set(i, mData[i]);
+            result.mData[i] = mData[i];
         }
         result.mMeta.setCompositeKey(mMeta.key());
         result.mMeta.setGlobalId(mMeta.gid());
