@@ -1,5 +1,5 @@
 # Codex High Frequency Data Framework
-Latest version: `2020.2.8`
+Latest version: `2020.3.9`
 
 ## What it does, and why
  - The Codex is an enumeration-backed auto-normalized data structure with design considerations for an IoT-centric comms protocol.
