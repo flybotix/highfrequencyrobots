@@ -14,6 +14,7 @@ public class RobotCodex <E extends Enum<E>> {
     protected double[] mData;
     protected double mDefaultValue = Double.NaN;
     protected boolean mHasChanged = false;
+    private String mLabel = "";
 
     /**
      * Creates a new Codex with the set metadata and default value
@@ -58,6 +59,9 @@ public class RobotCodex <E extends Enum<E>> {
     public void setMetadata(CodexMetadata<E> pMeta) {
         mMeta = pMeta;
     }
+
+    public void setLabel(String pLabel) { mLabel = pLabel; }
+    public String label() { return mLabel;}
 
     /**
      * @return (effectively) this is E.values().length
