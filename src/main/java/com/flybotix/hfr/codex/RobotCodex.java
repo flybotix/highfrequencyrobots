@@ -38,7 +38,7 @@ public class RobotCodex <E extends Enum<E>> {
     }
 
     /**
-     * Creates a Codex with <code>null</code> as the default value
+     * Creates a Codex with <code>NaN</code> as the default value
      * @param pEnum Enumeration backing the codex.  May NOT be null.
      */
     public RobotCodex(Class<E> pEnum) {
@@ -70,6 +70,9 @@ public class RobotCodex <E extends Enum<E>> {
         return mData.length;
     }
 
+    /**
+     * @return a string representing the CSV header. Includes metadata as the first few columns.
+     */
     public String getCSVHeader() {
         EnumSet<E> set = EnumSet.allOf(meta().getEnum());
         StringBuilder sb = new StringBuilder();
@@ -232,6 +235,49 @@ public class RobotCodex <E extends Enum<E>> {
     }
 
     /**
+     * Provides a way to ensure that a non-null / non-NaN number is returned
+     * @param pOrdinal the data piece to get
+     * @param pDefault the default value
+     * @return the value in the array at the location of the enum's ordinal, or default value if that is null
+     */
+    public double safeGet(int pOrdinal, double pDefault) {
+        if(isNull(pOrdinal)) {
+            return pDefault;
+        } else {
+            return get(pOrdinal);
+        }
+    }
+
+    /**
+     * Provides a way to ensure that a non-null / non-NaN number is returned
+     * @param pData the data piece to get
+     * @param pDefault the default value
+     * @param pClass the class of the state
+     * @return the value in the array at the location of the enum's ordinal, or default value if that is null
+     */
+    public  <T extends Enum<T>> T safeGet(E pData, T pDefault, Class<T> pClass) {
+        if(isNull(pData)) {
+            return pDefault;
+        } else {
+            return get(pData, pClass);
+        }
+    }
+
+    /**
+     * Provides a way to ensure that a non-null / non-NaN number is returned
+     * @param pData the data piece to get
+     * @param pDefault the default value
+     * @return the value in the array at the location of the enum's ordinal, or default value if that is null
+     */
+    public double safeGet(E pData, double pDefault) {
+        if(isNull(pData)) {
+            return pDefault;
+        } else {
+            return get(pData);
+        }
+    }
+
+    /**
      * Utility method to handle flags in a robot context. Sets a value to 1.0 if pValue == true, else the DEFAULT value (Double.NaN, etc)
      * If isSet() is called for this enumeration element, then that call will return TRUE if and only iff pValue is TRUE.
      * @param pData  the data to set
@@ -300,7 +346,8 @@ public class RobotCodex <E extends Enum<E>> {
      * @return whether the value at the enum's location is null or equals the codex's default value.
      */
     public boolean isNull(int pOrdinal) {
-        return Double.isNaN(mData[pOrdinal]) || mData[pOrdinal] == mDefaultValue;
+        return !Double.isFinite(mData[pOrdinal]) || mData[pOrdinal] == mDefaultValue;
+//        return Double.isNaN(mData[pOrdinal]) || mData[pOrdinal] == mDefaultValue;
     }
 
     /**
@@ -328,7 +375,7 @@ public class RobotCodex <E extends Enum<E>> {
     public CodexHash hash() {
         CodexHash codex = new CodexHash();
         for(int i = 0; i < mData.length; i++) {
-            if(get(i) != Double.NaN) {
+            if(isSet(i)) {
                 codex.bs.set(i);
                 codex.nonNullCount++;
             }
@@ -346,7 +393,7 @@ public class RobotCodex <E extends Enum<E>> {
     public RobotCodex<E> copy() {
         RobotCodex<E> result = new RobotCodex<>(mMeta.getEnum());
         for(int i = 0; i < mData.length; i++) {
-            result.set(i, mData[i]);
+            result.mData[i] = mData[i];
         }
         result.mMeta.setCompositeKey(mMeta.key());
         result.mMeta.setGlobalId(mMeta.gid());

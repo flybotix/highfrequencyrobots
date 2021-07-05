@@ -2,9 +2,9 @@ package com.flybotix.hfr.codex;
 
 public interface ICodexTimeProvider {
     /**
-     * @return the current time in NANOSECONDS
+     * @return the current time in SECONDS
      */
-    public default long getTimestamp() {
-        return System.nanoTime();
+    default double getTimestamp() {
+        return (double)System.nanoTime()/1e9;
     }
 }
