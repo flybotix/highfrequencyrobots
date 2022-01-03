@@ -92,10 +92,10 @@ The fact that a Codex must represent data of the same type is simultaneously thi
  - Made `RobotCodex::set(pEnum, boolean)` consistent with `RobotCodex.isSet(pEnum)` for the boolean element
 
 2020.2.15a
- - Added new method to format the CSV values of a CSV string in RobotCodex. Override RobotCodex.GLOBAL_CSV_FORMAT to change it. Call RobotCodex.toFormattedCSV() to retrieve the formatted string
+ - Added new method to format the CSV values of a CSV string in `RobotCodex`. Override `RobotCodex.GLOBAL_CSV_FORMAT` to change it. Call `RobotCodex.toFormattedCSV()` to retrieve the formatted string
 
 2020.2.19
- - Created safeGet() methods for certain scenarios that need extra safety in the value that is returned
+ - Created `safeGet()` methods for certain scenarios that need extra safety in the value that is returned
 
 2020.3.9
- - BREAKING CHANGE: ICodexTimeProvider now expects a DOUBLE value, representing SECONDS (instead of a long value representing nanoseconds). This should make it much easier to direcly read a CSV.
+ - BREAKING CHANGE: `ICodexTimeProvider` now expects a DOUBLE value, representing SECONDS (instead of a long value representing nanoseconds). This should make it much easier to direcly read a CSV.
