@@ -2,8 +2,8 @@
 Latest version: `2020.3.9`
 
 ## What it does, and why
- - The Codex is an enumeration-backed auto-normalized data structure with design considerations for an IoT-centric comms protocol.
- - The RobotCodex is a specialized version of Codex which has a (primitive) double array. 
+ - The `Codex` is an enumeration-backed auto-normalized data structure with design considerations for an IoT-centric comms protocol.
+ - The `RobotCodex` is a specialized version of `Codex` which has a (primitive) `double` array. 
  - The HFD project aims to streamline IoT data into normalized data structures for use in relational databases, with the end-goal of providing large datasets to ML.
  - The library handles network threading & socket comms internally, so robot code doesn't have to.  This includes batching of multiple tiny 'messages' in order to stay within the limitations of packet sizes and network rates.
  - The following protocols are available now or are inteded to become available:
@@ -13,7 +13,7 @@ Latest version: `2020.3.9`
          - Uses a basic Java listener/update interface
          - Codex data stays within the same process, and does not go remote
          - Useful for writing codex data to CSV from within the same process, or using Codexes to update a display
- - Automatically compresses `null` data prior to network transmission.  This means we no longer need to fear bandwidth limitations when sending a `null` element across a network. This does not apply to RobotCodex.
+ - Automatically compresses `null` data prior to network transmission.  This means we no longer need to fear bandwidth limitations when sending a `null` element across a network. This does not apply to `RobotCodex`.
  - Includes a 1-line command to **log to CSV** on the Robot.
  - Includes auto-incrementing metadata that keeps track of cycles for Codexes, which allows normalization of the data structure the Codex represents.
  - Includes benchmark & data integrity tests to ensure encode/decode/transit processing times are minimized.
