@@ -51,6 +51,8 @@ Second, during robot initialization, create a Codex and pass its reference where
 ```java
 // During robot init
 RobotCodex<RobotData> data = new RobotCodex(RobotData.class);
+data.createSimpleBooleanConverter(RobotData.isAutonomous);
+data.createSimpleEnumConverter(RobotData.elevatorState, ElevatorState.class);
 
 // Reset the codex at the beginning of each cycle.  This effectively sets each value to 'Double.NaN'.  Fill out data throughout each cycle.
 data.reset(); // beginning of the cycle
@@ -65,7 +67,7 @@ ElevatorState state = data.get(RobotData.elvatorState, ElevatorState.class);
 boolean isAutonomous = data.isSet(RobotData.isAutonomous);
 
 // Log this to a file
-String csvline = data.toCSV();
+String csvline = data.toFormattedCSV();
 ```
 
 ## The Codex: an enumerated array

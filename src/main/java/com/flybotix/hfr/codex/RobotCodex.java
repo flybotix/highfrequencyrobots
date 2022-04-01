@@ -1,20 +1,20 @@
 package com.flybotix.hfr.codex;
 
 import com.flybotix.hfr.util.lang.EnumUtils;
+import com.flybotix.hfr.util.lang.IConverter;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Arrays;
-import java.util.EnumSet;
+import java.util.*;
 
-public class RobotCodex <E extends Enum<E>> {
+public class RobotCodex<E extends Enum<E>> {
     public static NumberFormat sGLOBAL_CSV_FORMAT = new DecimalFormat("0.00000");
     private final static String NAN = Double.toString(Double.NaN);
     protected CodexMetadata<E> mMeta;
     protected double[] mData;
+    protected IConverter<Double, String>[] mConverters;
     protected double mDefaultValue = Double.NaN;
     protected boolean mHasChanged = false;
-    private String mLabel = "";
 
     /**
      * Creates a new Codex with the set metadata and default value
@@ -24,8 +24,12 @@ public class RobotCodex <E extends Enum<E>> {
     public RobotCodex(double pDefaultValue, CodexMetadata<E> pMeta) {
         mMeta = pMeta;
         mDefaultValue = pDefaultValue;
-        mData = new double[EnumUtils.getLength(pMeta.getEnum())];
+        int length = EnumUtils.getLength(pMeta.getEnum());
+        mData = new double[length];
         Arrays.fill(mData, mDefaultValue);
+        mConverters = new IConverter[length];
+        IConverter<Double, String> doubleFormat = f -> sGLOBAL_CSV_FORMAT.format(f);
+        Arrays.fill(mConverters, doubleFormat);
     }
 
     /**
@@ -60,14 +64,21 @@ public class RobotCodex <E extends Enum<E>> {
         mMeta = pMeta;
     }
 
-    public void setLabel(String pLabel) { mLabel = pLabel; }
-    public String label() { return mLabel;}
-
     /**
      * @return (effectively) this is E.values().length
      */
     public int length() {
         return mData.length;
+    }
+
+    /**
+     * Allows the toStrign(E pData) method to return a custom-formatted string. Useful when the number represents a
+     * state (such as enumeration or boolean). The CSV output will also use this conversion.
+     * @param pData Enumeration that will be converted
+     * @param pConversion The converter.
+     */
+    public void addConverter(E pData, IConverter<Double, String> pConversion) {
+        mConverters[pData.ordinal()] = pConversion;
     }
 
     /**
@@ -88,7 +99,7 @@ public class RobotCodex <E extends Enum<E>> {
 
     /**
      * @return A CSV string that represents this instance of the Codex, including metadata; formatted using the global
-     *  number format
+     *  number format and overriden converters
      */
     public String toFormattedCSV() {
         StringBuilder sb = new StringBuilder();
@@ -98,7 +109,8 @@ public class RobotCodex <E extends Enum<E>> {
         sb.append(sGLOBAL_CSV_FORMAT.format(meta().timestamp())).append(',');
         for(int i = 0; i < mData.length; i++) {
             if(isSet(i)) {
-                sb.append(sGLOBAL_CSV_FORMAT.format(mData[i])).append(',');
+                sb.append(toString(i)).append(',');
+//                sb.append(sGLOBAL_CSV_FORMAT.format(mData[i])).append(',');
             } else {
                 sb.append(',');
             }
@@ -180,6 +192,18 @@ public class RobotCodex <E extends Enum<E>> {
     public boolean hasChanged() {
         return mHasChanged;
     }
+
+    /**
+     * @return the string representation of this codex value. Very useful if converters are used.
+     */
+    public String toString(E pData) {
+        return toString(pData.ordinal());
+    }
+
+    /**
+     * @return the string representation of this codex value. Very useful if converters are used.
+     */
+    public String toString(int i) { return mConverters[i].convert(get(i)); }
 
     public String toString() {
         if(mData == null) return "null";
@@ -395,9 +419,30 @@ public class RobotCodex <E extends Enum<E>> {
         for(int i = 0; i < mData.length; i++) {
             result.mData[i] = mData[i];
         }
+        for(int i = 0; i < mConverters.length; i++) {
+            result.mConverters[i] = mConverters[i];
+        }
         result.mMeta.setCompositeKey(mMeta.key());
         result.mMeta.setGlobalId(mMeta.gid());
         result.mMeta.setTimestamp(mMeta.timestamp());
         return result;
+    }
+
+    /**
+     * This will format text output to be true or false
+     * @param pData the piece of data represented by a Boolean
+     */
+    public void createSimpleBooleanConverter(E pData) {
+        addConverter(pData, v->Boolean.toString(v == 1));
+    }
+
+    /**
+     * This will format text output to be the name associated to the enumeration
+     * @param pData the piece of data represented by a different enumeration
+     * @param pEnum the class of the enumeration that <code>pData</code> represents
+     */
+    public <T extends Enum<T>> void createSimpleEnumConverter(E pData, Class<T> pEnum) {
+        final List<T> enums = EnumUtils.getEnums(pEnum, true);
+        addConverter(pData, v -> enums.get((int) Math.round(v)).name());
     }
 }
