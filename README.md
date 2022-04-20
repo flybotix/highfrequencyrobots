@@ -42,9 +42,15 @@ public enum RobotData {
   pdb3,
   vrm0,
   totalcurrent,
-  gyro,
-  isAutonomous, // boolean
-  elevatorState; // backed by ElevatorState
+  gyro, 
+    
+  // This piece of data represents a Boolean flag, true/false.
+  @RobotCodex.FlagCodex
+  isAutonomous,
+    
+  // This represents a state machine. The logger will automtically convert this from a number to text in order to make it easier to read. However, if you want to graph this, then do not put this Annotation.  
+  @RobotCodex.StateCodex(stateEnum = ElevatorState.class)
+  elevatorState;
 }
 ```
 Second, during robot initialization, create a Codex and pass its reference where it's needed.  Try not to create a 'new' Codex for the same enumeration, as that may cause Java's garbage collection to pause the robot.
@@ -101,3 +107,6 @@ The fact that a Codex must represent data of the same type is simultaneously thi
 
 2020.3.9
  - BREAKING CHANGE: `ICodexTimeProvider` now expects a DOUBLE value, representing SECONDS (instead of a long value representing nanoseconds). This should make it much easier to direcly read a CSV.
+
+2022.4.20 (ish)
+ - Created the annotations for CodexState and CodexFlag. This will auto-generate a text converter for pieces of data that are backed by a different enumeration, and use that text when logging to CSV. This is useful for NetworkTables as well. In the future, work will be done to provide both the ordinal and the text output to CSV, since it is easier to graph the state's ordinal.

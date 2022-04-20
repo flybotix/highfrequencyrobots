@@ -1,6 +1,7 @@
 package com.flybotix.hfr;
 
 import com.flybotix.hfr.codex.CodexOf;
+import com.flybotix.hfr.codex.RobotCodex;
 
 public enum ETestData implements CodexOf<Double>{
   pdb0,

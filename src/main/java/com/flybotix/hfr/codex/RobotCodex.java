@@ -3,6 +3,11 @@ package com.flybotix.hfr.codex;
 import com.flybotix.hfr.util.lang.EnumUtils;
 import com.flybotix.hfr.util.lang.IConverter;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
@@ -30,6 +35,21 @@ public class RobotCodex<E extends Enum<E>> {
         mConverters = new IConverter[length];
         IConverter<Double, String> doubleFormat = f -> sGLOBAL_CSV_FORMAT.format(f);
         Arrays.fill(mConverters, doubleFormat);
+
+        // Deal with annotations
+        Map<E, StateCodex> states = EnumUtils.getEnumsAnnotatedWith(pMeta.getEnum(), StateCodex.class);
+        for(E e : states.keySet()) {
+            if(states.get(e).logStateName()) {
+                createSimpleEnumConverter(e, states.get(e).stateEnum());
+            }
+        }
+
+        Map<E, FlagCodex> flags = EnumUtils.getEnumsAnnotatedWith(pMeta.getEnum(), FlagCodex.class);
+        for(E e : flags.keySet()) {
+            if(flags.get(e).logFlagText()) {
+                createSimpleBooleanConverter(e);
+            }
+        }
     }
 
     /**
@@ -441,8 +461,27 @@ public class RobotCodex<E extends Enum<E>> {
      * @param pData the piece of data represented by a different enumeration
      * @param pEnum the class of the enumeration that <code>pData</code> represents
      */
-    public <T extends Enum<T>> void createSimpleEnumConverter(E pData, Class<T> pEnum) {
-        final List<T> enums = EnumUtils.getEnums(pEnum, true);
-        addConverter(pData, v -> enums.get((int) Math.round(v)).name());
+    public <T> void createSimpleEnumConverter(E pData, Class<T> pEnum) {
+        final List<T> enums = Arrays.asList(pEnum.getEnumConstants());
+        addConverter(pData, v -> enums.get((int) Math.round(v)).toString());
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface StateCodex {
+        Class<?> stateEnum();
+        boolean logStateName() default true;
+
+        // Will eventually create a way to log both the text and the ordinal. Ordinals are useful for graphs.
+//        boolean logStateOrdinal() default true;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface FlagCodex {
+        boolean logFlagText() default true;
+
+        // Will eventually create a way to log both the text and the 0/1 flag value. The 0/1 value is useful for graphs.
+//        boolean logFlagBool() default true;
     }
 }
