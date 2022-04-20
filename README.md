@@ -26,7 +26,7 @@ repositories {
      maven { url "https://jitpack.io" }
 }
 dependencies {
-      implementation 'com.github.flybotix:highfrequencyrobots:2022.4.1'
+      implementation 'com.github.flybotix:highfrequencyrobots:2022.4.20'
 }
 ```
 
